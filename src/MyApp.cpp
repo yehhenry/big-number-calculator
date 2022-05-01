@@ -3,10 +3,6 @@
 #define WINDOW_WIDTH  660
 #define WINDOW_HEIGHT 820
 
-vector<string> input;
-vector<string> result;
-bool isEdit = true;
-
 MyApp::MyApp() {
   ///
   /// Create our main App instance.
@@ -96,95 +92,25 @@ void MyApp::OnFinishLoading(ultralight::View* caller,
   /// This is called when a frame finishes loading on the page.
   ///
 }
-bool MyApp::IsNumber(const std::string& s)
-{
-    std::string::const_iterator it = s.begin();
-    while (it != s.end() && (std::isdigit(*it) || *it == '-')) ++it;
-    return !s.empty() && it == s.end();
-}
 
-std::string MyApp::JSStringToStdString(JSStringRef jsString) {
-    size_t maxBufferSize = JSStringGetMaximumUTF8CStringSize(jsString);
-    char* utf8Buffer = new char[maxBufferSize];
-    size_t bytesWritten = JSStringGetUTF8CString(jsString, utf8Buffer, maxBufferSize);
-    std::string utf_string = std::string (utf8Buffer, bytesWritten -1); // the last byte is a null \0 which std::string doesn't need.
-    delete [] utf8Buffer;
-    return utf_string;
-}
 
-void MyApp::SetText(JSContextRef ctx, string selector, string content) {
-    string runScript = "document.querySelector('" + selector + "').innerText = '" + content + "';";
+// This callback will be bound to 'OnButtonClick()' on the page.
+JSValueRef OnButtonClick(JSContextRef ctx, JSObjectRef function,
+                         JSObjectRef thisObject, size_t argumentCount,
+                         const JSValueRef arguments[], JSValueRef* exception) {
+
+    const char* str =
+            "document.getElementById('result').innerText = 'Ultralight rocks!'";
+
     // Create our string of JavaScript
-    JSStringRef script = JSStringCreateWithUTF8CString(runScript.c_str());
+    JSStringRef script = JSStringCreateWithUTF8CString(str);
 
     // Execute it with JSEvaluateScript, ignoring other parameters for now
     JSEvaluateScript(ctx, script, 0, 0, 0, 0);
 
     // Release our string (we only Release what we Create)
     JSStringRelease(script);
-}
 
-// This callback will be bound to 'OnButtonClick()' on the page.
-JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
-                         JSObjectRef thisObject, size_t argumentCount,
-                         const JSValueRef arguments[], JSValueRef* exception) {
-
-    for (int index = 0; index < argumentCount; index ++) {
-        JSStringRef thisArg = JSValueToStringCopy(ctx,arguments[index],NULL);
-        string thisArgStr = JSStringToStdString(thisArg);
-        if (thisArgStr == "reset") {
-            isEdit = true;
-            result.clear();
-            input.clear();
-        }else if(thisArgStr == "-") {
-            if (input.size() > 0) {
-                if (IsNumber(input[input.size() - 1])) {
-                    input[input.size() - 1] = to_string((stoi(input[input.size() - 1]) * -1));
-                }
-            }
-        }else if (thisArgStr == "=" && isEdit) {
-            isEdit = false;
-        }else if (thisArgStr == "<") {
-            isEdit = true;
-            result.clear();
-            if (input.size() >= 1) {
-                input.pop_back();
-            }
-        }else if (thisArgStr == "! ") {
-            if (input.size() >= 1) {
-                if (IsNumber(input[input.size() - 1])) {
-                    input.push_back(thisArgStr);
-                }
-            }
-        }else if (thisArgStr == "edit") {
-                isEdit = true;
-                result.clear();
-        }else {
-            isEdit = true;
-            if (input.size() >= 1) {
-                if (thisArgStr[0] != ' ' && IsNumber(thisArgStr) && IsNumber(input[input.size() - 1])) {
-                     input[input.size() - 1] += thisArgStr;
-                }else {
-                    input.push_back(thisArgStr);
-                }
-            }else {
-                input.push_back(thisArgStr);
-            }
-        }
-    }
-    if (isEdit) {
-        if (input.size() <= 0) {
-            SetText(ctx, ".main-number", "0");
-        }else {
-            SetText(ctx, ".main-number", join(input, ""));
-        }
-        SetText(ctx, ".sub-number", join(result, ""));
-    }else {
-        // TODO: call Blamath program & fetch result
-        string blaResult = "this is Blamath result!!"; // fake result
-        SetText(ctx, ".sub-number", join(input, ""));
-        SetText(ctx, ".main-number", blaResult);
-    }
     return JSValueMakeNull(ctx);
 }
 
@@ -203,24 +129,19 @@ void MyApp::OnDOMReady(ultralight::View* caller,
     // This call will lock the execution context for the current
     // thread as long as the Ref<> is alive.
     //
-    RefPtr<JSContext> context = caller->LockJSContext();
+    Ref<JSContext> context = caller->LockJSContext();
 
     // Get the underlying JSContextRef for use with the
     // JavaScriptCore C API.
-    JSContextRef ctx = *context.get();
-
-    // init display
-    input.clear();
-    result.clear();
-    SetText(ctx, ".main-number", "0");
-    SetText(ctx, ".sub-number", "");
+    JSContextRef ctx = context.get();
 
     // Create a JavaScript String containing the name of our callback.
     JSStringRef name = JSStringCreateWithUTF8CString("OnButtonClick");
 
     // Create a garbage-collected JavaScript function that is bound to our
     // native C callback 'OnButtonClick()'.
-    JSObjectRef func = JSObjectMakeFunctionWithCallback(ctx, name, OnButtonClick);
+    JSObjectRef func = JSObjectMakeFunctionWithCallback(ctx, name,
+                                                        OnButtonClick);
 
     // Get the global JavaScript object (aka 'window')
     JSObjectRef globalObj = JSContextGetGlobalObject(ctx);
