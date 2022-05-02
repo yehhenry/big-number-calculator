@@ -166,7 +166,6 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
             }
         }
     }
-    // SetText(ctx, ".sub-number", join(input, ""));
     if (isEdit) {
         if (input.size() <= 0) {
             SetText(ctx, ".main-number", "0");
