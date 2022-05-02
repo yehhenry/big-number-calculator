@@ -402,4 +402,5 @@ FodyWeavers.xsd
 build_*/
 .DS_Store
 cmake-build-debug/
-build/
+.idea/
+cmake-build-debug-coverage
