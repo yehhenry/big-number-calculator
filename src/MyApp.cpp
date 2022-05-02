@@ -93,17 +93,47 @@ void MyApp::OnFinishLoading(ultralight::View* caller,
   ///
 }
 
+std::string MyApp::JSStringToStdString(JSStringRef jsString) {
+    size_t maxBufferSize = JSStringGetMaximumUTF8CStringSize(jsString);
+    char* utf8Buffer = new char[maxBufferSize];
+    size_t bytesWritten = JSStringGetUTF8CString(jsString, utf8Buffer, maxBufferSize);
+    std::string utf_string = std::string (utf8Buffer, bytesWritten -1); // the last byte is a null \0 which std::string doesn't need.
+    delete [] utf8Buffer;
+    return utf_string;
+}
+
+std::string MyApp::GetRenderTitleJS(string content) {
+    string result = "";
+    return result;
+}
+
+std::string MyApp::GetRenderSubtitleJS(string content) {
+    string result = "";
+    return result;
+}
 
 // This callback will be bound to 'OnButtonClick()' on the page.
-JSValueRef OnButtonClick(JSContextRef ctx, JSObjectRef function,
+JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
                          JSObjectRef thisObject, size_t argumentCount,
                          const JSValueRef arguments[], JSValueRef* exception) {
 
-    const char* str =
-            "document.getElementById('result').innerText = 'Ultralight rocks!'";
+//    const char* str = ("document.getElementById('result').innerText = '" + to_string(argumentCount) + "'").c_str();
+    string arg = "document.getElementById('result').innerText = '";
+    for (int index = 0; index < argumentCount; index ++) {
+        JSStringRef thisArg = JSValueToStringCopy(ctx,arguments[index],NULL);
+        string thisArgStr =  JSStringToStdString(thisArg);
+        if (thisArgStr == "reset") {
+
+        }else if(thisArgStr == "-") {
+
+        }else {
+
+        }
+    }
+    arg += "'";
 
     // Create our string of JavaScript
-    JSStringRef script = JSStringCreateWithUTF8CString(str);
+    JSStringRef script = JSStringCreateWithUTF8CString(arg.c_str());
 
     // Execute it with JSEvaluateScript, ignoring other parameters for now
     JSEvaluateScript(ctx, script, 0, 0, 0, 0);
@@ -129,19 +159,18 @@ void MyApp::OnDOMReady(ultralight::View* caller,
     // This call will lock the execution context for the current
     // thread as long as the Ref<> is alive.
     //
-    Ref<JSContext> context = caller->LockJSContext();
+    RefPtr<JSContext> context = caller->LockJSContext();
 
     // Get the underlying JSContextRef for use with the
     // JavaScriptCore C API.
-    JSContextRef ctx = context.get();
+    JSContextRef ctx = *context.get();
 
     // Create a JavaScript String containing the name of our callback.
     JSStringRef name = JSStringCreateWithUTF8CString("OnButtonClick");
 
     // Create a garbage-collected JavaScript function that is bound to our
     // native C callback 'OnButtonClick()'.
-    JSObjectRef func = JSObjectMakeFunctionWithCallback(ctx, name,
-                                                        OnButtonClick);
+    JSObjectRef func = JSObjectMakeFunctionWithCallback(ctx, name, OnButtonClick);
 
     // Get the global JavaScript object (aka 'window')
     JSObjectRef globalObj = JSContextGetGlobalObject(ctx);
