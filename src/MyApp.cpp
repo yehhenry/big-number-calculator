@@ -150,9 +150,15 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
             if (input.size() >= 1) {
                 input.pop_back();
             }
+        }else if (thisArgStr == "! ") {
+            if (input.size() >= 1) {
+                if (IsNumber(input[input.size() - 1])) {
+                    input.push_back(thisArgStr);
+                }
+            }
         }else if (thisArgStr == "edit") {
-            isEdit = true;
-            result.clear();
+                isEdit = true;
+                result.clear();
         }else {
             isEdit = true;
             if (input.size() >= 1) {

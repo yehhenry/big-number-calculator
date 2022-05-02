@@ -80,7 +80,11 @@ MACRO(ADD_APP source_list)
 
   # Set the assets path to "/assets" or "/../Resources/assets" on macOS
   if (APPLE)
-    set(ASSETS_PATH "$<TARGET_FILE_DIR:${APP_NAME}>/../Resources/assets") 
+    set(ASSETS_PATH "$<TARGET_FILE_DIR:${APP_NAME}>/../Resources/assets")
+#    execute_process (
+#      COMMAND bash -c "cp ${CMAKE_CURRENT_LIST_DIR}/Icon? ${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/"
+#      COMMAND bash -c "${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}"
+#    )
   else ()
     set(ASSETS_PATH "$<TARGET_FILE_DIR:${APP_NAME}>/assets") 
   endif ()
@@ -97,7 +101,11 @@ MACRO(ADD_APP source_list)
 
   # Copy resources to assets directory
   add_custom_command(TARGET ${APP_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_RESOURCES_DIR}" "${ASSETS_PATH}/resources")
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_RESOURCES_DIR}" "${ASSETS_PATH}/resources"
+    COMMAND bash -c "cp ${CMAKE_CURRENT_LIST_DIR}/Icon? ${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/"
+    COMMAND bash -c "${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}")
+
     
   add_dependencies(${APP_NAME} UltralightSDK)
+
 ENDMACRO()
