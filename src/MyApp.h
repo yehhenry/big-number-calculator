@@ -52,15 +52,16 @@ public:
     virtual void OnChangeTitle(ultralight::View* caller,
     const String& title) override;
 
-    virtual std::string JSStringToStdString(JSStringRef);
+    static std::string JSStringToStdString(JSStringRef);
 
-    JSValueRef OnButtonClick(JSContextRef, JSObjectRef, JSObjectRef, size_t,const JSValueRef[], JSValueRef*);
+    static JSValueRef OnButtonClick(JSContextRef, JSObjectRef, JSObjectRef, size_t,const JSValueRef[], JSValueRef*);
 
-    virtual std::string GetRenderTitleJS(string);
-    virtual std::string GetRenderSubtitleJS(string);
+    static bool IsNumber(const std::string&);
+    static void SetText(JSContextRef, string, string);
+
     // join method
     template <class T>
-    std::string join(T& val, std::string delim)
+    std::string static join(T& val, std::string delim)
     {
         std::string str;
         typename T::iterator it;
@@ -76,9 +77,7 @@ public:
         return str;
     }
 
-    vector<string> input;
-    vector<string> result;
-    bool isInput = true;
+
 protected:
     RefPtr<App> app_;
     RefPtr<Window> window_;

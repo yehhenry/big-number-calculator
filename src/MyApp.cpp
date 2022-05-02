@@ -3,6 +3,10 @@
 #define WINDOW_WIDTH  660
 #define WINDOW_HEIGHT 820
 
+vector<string> input;
+vector<string> result;
+bool isEdit = true;
+
 MyApp::MyApp() {
   ///
   /// Create our main App instance.
@@ -92,6 +96,12 @@ void MyApp::OnFinishLoading(ultralight::View* caller,
   /// This is called when a frame finishes loading on the page.
   ///
 }
+bool MyApp::IsNumber(const std::string& s)
+{
+    std::string::const_iterator it = s.begin();
+    while (it != s.end() && (std::isdigit(*it) || *it == '-')) ++it;
+    return !s.empty() && it == s.end();
+}
 
 std::string MyApp::JSStringToStdString(JSStringRef jsString) {
     size_t maxBufferSize = JSStringGetMaximumUTF8CStringSize(jsString);
@@ -102,14 +112,16 @@ std::string MyApp::JSStringToStdString(JSStringRef jsString) {
     return utf_string;
 }
 
-std::string MyApp::GetRenderTitleJS(string content) {
-    string result = "";
-    return result;
-}
+void MyApp::SetText(JSContextRef ctx, string selector, string content) {
+    string runScript = "document.querySelector('" + selector + "').innerText = '" + content + "';";
+    // Create our string of JavaScript
+    JSStringRef script = JSStringCreateWithUTF8CString(runScript.c_str());
 
-std::string MyApp::GetRenderSubtitleJS(string content) {
-    string result = "";
-    return result;
+    // Execute it with JSEvaluateScript, ignoring other parameters for now
+    JSEvaluateScript(ctx, script, 0, 0, 0, 0);
+
+    // Release our string (we only Release what we Create)
+    JSStringRelease(script);
 }
 
 // This callback will be bound to 'OnButtonClick()' on the page.
@@ -117,30 +129,57 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
                          JSObjectRef thisObject, size_t argumentCount,
                          const JSValueRef arguments[], JSValueRef* exception) {
 
-//    const char* str = ("document.getElementById('result').innerText = '" + to_string(argumentCount) + "'").c_str();
-    string arg = "document.getElementById('result').innerText = '";
     for (int index = 0; index < argumentCount; index ++) {
         JSStringRef thisArg = JSValueToStringCopy(ctx,arguments[index],NULL);
-        string thisArgStr =  JSStringToStdString(thisArg);
+        string thisArgStr = JSStringToStdString(thisArg);
         if (thisArgStr == "reset") {
-
+            isEdit = true;
+            result.clear();
+            input.clear();
         }else if(thisArgStr == "-") {
-
+            if (input.size() > 0) {
+                if (IsNumber(input[input.size() - 1])) {
+                    input[input.size() - 1] = to_string((stoi(input[input.size() - 1]) * -1));
+                }
+            }
+        }else if (thisArgStr == "=" && isEdit) {
+            isEdit = false;
+        }else if (thisArgStr == "<") {
+            isEdit = true;
+            result.clear();
+            if (input.size() >= 1) {
+                input.pop_back();
+            }
+        }else if (thisArgStr == "edit") {
+            isEdit = true;
+            result.clear();
         }else {
-
+            isEdit = true;
+            if (input.size() >= 1) {
+                if (thisArgStr[0] != ' ' && IsNumber(thisArgStr) && IsNumber(input[input.size() - 1])) {
+                     input[input.size() - 1] += thisArgStr;
+                }else {
+                    input.push_back(thisArgStr);
+                }
+            }else {
+                input.push_back(thisArgStr);
+            }
         }
     }
-    arg += "'";
-
-    // Create our string of JavaScript
-    JSStringRef script = JSStringCreateWithUTF8CString(arg.c_str());
-
-    // Execute it with JSEvaluateScript, ignoring other parameters for now
-    JSEvaluateScript(ctx, script, 0, 0, 0, 0);
-
-    // Release our string (we only Release what we Create)
-    JSStringRelease(script);
-
+    // SetText(ctx, ".sub-number", join(input, ""));
+    if (isEdit) {
+        if (input.size() <= 0) {
+            SetText(ctx, ".main-number", "0");
+        }else {
+            SetText(ctx, ".main-number", join(input, ""));
+        }
+        SetText(ctx, ".sub-number", join(result, ""));
+    }else {
+        // TODO: call Blamath program & fetch result
+        string blaResult = "this is Blamath result!!"; // fake result
+        SetText(ctx, ".sub-number", join(input, ""));
+        SetText(ctx, ".main-number", blaResult);
+    }
     return JSValueMakeNull(ctx);
 }
 
@@ -164,6 +203,12 @@ void MyApp::OnDOMReady(ultralight::View* caller,
     // Get the underlying JSContextRef for use with the
     // JavaScriptCore C API.
     JSContextRef ctx = *context.get();
+
+    // init display
+    input.clear();
+    result.clear();
+    SetText(ctx, ".main-number", "0");
+    SetText(ctx, ".sub-number", "");
 
     // Create a JavaScript String containing the name of our callback.
     JSStringRef name = JSStringCreateWithUTF8CString("OnButtonClick");
