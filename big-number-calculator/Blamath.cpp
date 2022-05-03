@@ -105,7 +105,7 @@ static int _blaComp(const char* lhs, int lint, int ldot, int lfrac, int lscale, 
 	return 0;
 }
 
-static std::string _blaRound(char* lhs, int lint, int ldot, int lfrac, int lscale, int scale, int sign, bool add_trailing_zeroes, bool round_last = false) {
+static std::string _blaRound(char* lhs, int lint, int ldot, int lfrac, int lscale, int scale, int sign, bool addTrailingZeroes, bool roundLast = false) {
 	while (lhs[lint] == '0' && lint + 1 < ldot) {
 		lint++;
 	}
@@ -122,7 +122,7 @@ static std::string _blaRound(char* lhs, int lint, int ldot, int lfrac, int lscal
 		}
 	}
 
-	if (round_last) {
+	if (roundLast) {
 		if (lscale > scale) {
 			while (scale > 0 && lhs[lfrac + scale - 1] == '9' && lhs[lfrac + scale] >= '5') {
 				scale--;
@@ -168,7 +168,7 @@ static std::string _blaRound(char* lhs, int lint, int ldot, int lfrac, int lscal
 		lhs[--lint] = '-';
 	}
 
-	if (lscale == scale || !add_trailing_zeroes) {
+	if (lscale == scale || !addTrailingZeroes) {
 		return std::string(std::string(lhs + lint).substr(0, lfrac + lscale - lint));
 	}
 	else {
@@ -188,15 +188,15 @@ static std::string _blaAddPositive(const char* lhs, int lint, int ldot, int lfra
 
 	int resint, resdot, resfrac, resscale;
 
-	int result_len = std::max(llen, rlen) + 1;
-	int result_scale = std::max(lscale, rscale);
-	int result_size = result_len + result_scale + 3;
-	std::string result(result_size, '0');
+	int resultLen = std::max(llen, rlen) + 1;
+	int resultScale = std::max(lscale, rscale);
+	int resultSize = resultLen + resultScale + 3;
+	std::string result(resultSize, '0');
 
 	int i, um = 0;
-	int cur_pos = result_size;
-	int was_frac = 0;
-	for (i = result_scale - 1; i >= 0; i--) {
+	int curPos = resultSize;
+	int wasFrac = 0;
+	for (i = resultScale - 1; i >= 0; i--) {
 		if (i < lscale) {
 			um += lhs[lfrac + i] - '0';
 		}
@@ -204,20 +204,20 @@ static std::string _blaAddPositive(const char* lhs, int lint, int ldot, int lfra
 			um += rhs[rfrac + i] - '0';
 		}
 
-		if (um != 0 || was_frac) {
-			result[--cur_pos] = (char)(um % 10 + '0');
+		if (um != 0 || wasFrac) {
+			result[--curPos] = (char)(um % 10 + '0');
 			um /= 10;
-			was_frac = 1;
+			wasFrac = 1;
 		}
 	}
-	resscale = result_size - cur_pos;
-	resfrac = cur_pos;
-	if (was_frac) {
-		result[--cur_pos] = '.';
+	resscale = resultSize - curPos;
+	resfrac = curPos;
+	if (wasFrac) {
+		result[--curPos] = '.';
 	}
-	resdot = cur_pos;
+	resdot = curPos;
 
-	for (int i = 0; i < result_len; i++) {
+	for (int i = 0; i < resultLen; i++) {
 		if (i < llen) {
 			um += lhs[ldot - i - 1] - '0';
 		}
@@ -225,11 +225,11 @@ static std::string _blaAddPositive(const char* lhs, int lint, int ldot, int lfra
 			um += rhs[rdot - i - 1] - '0';
 		}
 
-		result[--cur_pos] = (char)(um % 10 + '0');
+		result[--curPos] = (char)(um % 10 + '0');
 		um /= 10;
 	}
-	resint = cur_pos;
-	BLA_ASSERT(cur_pos > 0);
+	resint = curPos;
+	BLA_ASSERT(curPos > 0);
 
 	return _blaRound((char*)result.data(), resint, resdot, resfrac, resscale, scale, sign, 1);
 }
@@ -240,16 +240,16 @@ static std::string _blaSubPositive(const char* lhs, int lint, int ldot, int lfra
 
 	int resint, resdot, resfrac, resscale;
 
-	int result_len = llen;
-	int result_scale = std::max(lscale, rscale);
-	int result_size = result_len + result_scale + 3;
-	std::string result(result_size, '0');
+	int resultLen = llen;
+	int resultScale = std::max(lscale, rscale);
+	int resultSize = resultLen + resultScale + 3;
+	std::string result(resultSize, '0');
 
-	int i, um = 0, next_um = 0;
-	int cur_pos = result_size;
-	int was_frac = 0;
-	for (i = result_scale - 1; i >= 0; i--) {
-		um = next_um;
+	int i, um = 0, nextUm = 0;
+	int curPos = resultSize;
+	int wasFrac = 0;
+	for (i = resultScale - 1; i >= 0; i--) {
+		um = nextUm;
 		if (i < lscale) {
 			um += lhs[lfrac + i] - '0';
 		}
@@ -257,43 +257,43 @@ static std::string _blaSubPositive(const char* lhs, int lint, int ldot, int lfra
 			um -= rhs[rfrac + i] - '0';
 		}
 		if (um < 0) {
-			next_um = -1;
+			nextUm = -1;
 			um += 10;
 		}
 		else {
-			next_um = 0;
+			nextUm = 0;
 		}
 
-		if (um != 0 || was_frac) {
-			result[--cur_pos] = (char)(um + '0');
-			was_frac = 1;
+		if (um != 0 || wasFrac) {
+			result[--curPos] = (char)(um + '0');
+			wasFrac = 1;
 		}
 	}
-	resscale = result_size - cur_pos;
-	resfrac = cur_pos;
-	if (was_frac) {
-		result[--cur_pos] = '.';
+	resscale = resultSize - curPos;
+	resfrac = curPos;
+	if (wasFrac) {
+		result[--curPos] = '.';
 	}
-	resdot = cur_pos;
+	resdot = curPos;
 
-	for (int i = 0; i < result_len; i++) {
-		um = next_um;
+	for (int i = 0; i < resultLen; i++) {
+		um = nextUm;
 		um += lhs[ldot - i - 1] - '0';
 		if (i < rlen) {
 			um -= rhs[rdot - i - 1] - '0';
 		}
 		if (um < 0) {
-			next_um = -1;
+			nextUm = -1;
 			um += 10;
 		}
 		else {
-			next_um = 0;
+			nextUm = 0;
 		}
 
-		result[--cur_pos] = (char)(um + '0');
+		result[--curPos] = (char)(um + '0');
 	}
-	resint = cur_pos;
-	BLA_ASSERT(cur_pos > 0);
+	resint = curPos;
+	BLA_ASSERT(curPos > 0);
 
 	return _blaRound((char*)result.data(), resint, resdot, resfrac, resscale, scale, sign, 1);
 }
@@ -304,41 +304,41 @@ static std::string _blaMulPositive(const char* lhs, int lint, int ldot, int lfra
 
 	int resint, resdot, resfrac, resscale;
 
-	int result_len = llen + rlen;
-	int result_scale = lscale + rscale;
-	int result_size = result_len + result_scale + 3;
-	std::string result(result_size, '0');
+	int resultLen = llen + rlen;
+	int resultScale = lscale + rscale;
+	int resultSize = resultLen + resultScale + 3;
+	std::string result(resultSize, '0');
 
-	int* res = (int*)malloc(sizeof(int) * result_size);
-	memset(res, 0, sizeof(int) * result_size);
+	int* res = (int*)malloc(sizeof(int) * resultSize);
+	memset(res, 0, sizeof(int) * resultSize);
 	for (int i = -lscale; i < llen; i++) {
 		int x = (i < 0 ? lhs[lfrac - i - 1] : lhs[ldot - i - 1]) - '0';
 		for (int j = -rscale; j < rlen; j++) {
 			int y = (j < 0 ? rhs[rfrac - j - 1] : rhs[rdot - j - 1]) - '0';
-			res[i + j + result_scale] += x * y;
+			res[i + j + resultScale] += x * y;
 		}
 	}
-	for (int i = 0; i + 1 < result_size; i++) {
+	for (int i = 0; i + 1 < resultSize; i++) {
 		res[i + 1] += res[i] / 10;
 		res[i] %= 10;
 	}
 
-	int cur_pos = result_size;
-	for (int i = 0; i < result_scale; i++) {
-		result[--cur_pos] = (char)(res[i] + '0');
+	int curPos = resultSize;
+	for (int i = 0; i < resultScale; i++) {
+		result[--curPos] = (char)(res[i] + '0');
 	}
-	resscale = result_size - cur_pos;
-	resfrac = cur_pos;
-	if (result_scale > 0) {
-		result[--cur_pos] = '.';
+	resscale = resultSize - curPos;
+	resfrac = curPos;
+	if (resultScale > 0) {
+		result[--curPos] = '.';
 	}
-	resdot = cur_pos;
+	resdot = curPos;
 
-	for (int i = result_scale; i < result_len + result_scale; i++) {
-		result[--cur_pos] = (char)(res[i] + '0');
+	for (int i = resultScale; i < resultLen + resultScale; i++) {
+		result[--curPos] = (char)(res[i] + '0');
 	}
-	resint = cur_pos;
-	BLA_ASSERT(cur_pos > 0);
+	resint = curPos;
+	BLA_ASSERT(curPos > 0);
 
 	free(res);
 
@@ -356,21 +356,21 @@ static std::string _blaDivPositive(const char* lhs, int lint, int ldot, int lfra
 
 	int resint, resdot = -1, resfrac = -1, resscale;
 
-	int result_len = std::max(llen + rscale - rlen + 1, 1);
-	int result_scale = scale;
-	int result_size = result_len + result_scale + 3;
+	int resultLen = std::max(llen + rscale - rlen + 1, 1);
+	int resultScale = scale;
+	int resultSize = resultLen + resultScale + 3;
 
 	if (rscale == 0 && rhs[rint] == '0') {
 		std::cerr << ("Division by zero in function bcdiv") << std::endl << std::endl;
 		return ZERO;
 	}
 
-	int dividend_len = llen + lscale;
-	int divider_len = rlen + rscale;
-	int* dividend = (int*)malloc(sizeof(int) * (result_size + dividend_len + divider_len));
-	int* divider = (int*)malloc(sizeof(int) * divider_len);
-	memset(dividend, 0, sizeof(int) * (result_size + dividend_len + divider_len));
-	memset(divider, 0, sizeof(int) * divider_len);
+	int dividendLen = llen + lscale;
+	int dividerLen = rlen + rscale;
+	int* dividend = (int*)malloc(sizeof(int) * (resultSize + dividendLen + dividerLen));
+	int* divider = (int*)malloc(sizeof(int) * dividerLen);
+	memset(dividend, 0, sizeof(int) * (resultSize + dividendLen + dividerLen));
+	memset(divider, 0, sizeof(int) * dividerLen);
 
 	for (int i = -lscale; i < llen; i++) {
 		int x = (i < 0 ? lhs[lfrac - i - 1] : lhs[ldot - i - 1]) - '0';
@@ -382,48 +382,48 @@ static std::string _blaDivPositive(const char* lhs, int lint, int ldot, int lfra
 		divider[rlen - i - 1] = x;
 	}
 
-	int divider_skip = 0;
-	while (divider_len > 0 && divider[0] == 0) {
+	int dividerSkip = 0;
+	while (dividerLen > 0 && divider[0] == 0) {
 		divider++;
-		divider_skip++;
-		divider_len--;
+		dividerSkip++;
+		dividerLen--;
 	}
-	BLA_ASSERT(divider_len > 0);
+	BLA_ASSERT(dividerLen > 0);
 
-	int cur_pow = llen - rlen + divider_skip;
-	int cur_pos = 2;
+	int curPow = llen - rlen + dividerSkip;
+	int curPos = 2;
 
-	if (cur_pow < -scale) {
-		divider -= divider_skip;
-		divider_len += divider_skip;
+	if (curPow < -scale) {
+		divider -= dividerSkip;
+		dividerLen += dividerSkip;
 		free(dividend);
 		free(divider);
 		return _blaZero(scale);
 	}
 
-	std::string result(result_size, '0');
-	resint = cur_pos;
-	if (cur_pow < 0) {
-		result[cur_pos++] = '0';
-		resdot = cur_pos;
-		result[cur_pos++] = '.';
-		resfrac = cur_pos;
-		for (int i = -1; i > cur_pow; i--) {
-			result[cur_pos++] = '0';
+	std::string result(resultSize, '0');
+	resint = curPos;
+	if (curPow < 0) {
+		result[curPos++] = '0';
+		resdot = curPos;
+		result[curPos++] = '.';
+		resfrac = curPos;
+		for (int i = -1; i > curPow; i--) {
+			result[curPos++] = '0';
 		}
 	}
 
-	int beg = 0, real_beg = 0;
-	while (cur_pow >= -scale) {
+	int beg = 0, realBeg = 0;
+	while (curPow >= -scale) {
 		char dig = '0';
 		while (true) {
-			if (real_beg < beg && dividend[real_beg] == 0) {
-				real_beg++;
+			if (realBeg < beg && dividend[realBeg] == 0) {
+				realBeg++;
 			}
 
 			bool less = false;
-			if (real_beg == beg) {
-				for (int i = 0; i < divider_len; i++) {
+			if (realBeg == beg) {
+				for (int i = 0; i < dividerLen; i++) {
 					if (dividend[beg + i] != divider[i]) {
 						less = (dividend[beg + i] < divider[i]);
 						break;
@@ -434,7 +434,7 @@ static std::string _blaDivPositive(const char* lhs, int lint, int ldot, int lfra
 				break;
 			}
 
-			for (int i = divider_len - 1; i >= 0; i--) {
+			for (int i = dividerLen - 1; i >= 0; i--) {
 				dividend[beg + i] -= divider[i];
 				if (dividend[beg + i] < 0) {
 					dividend[beg + i] += 10;
@@ -444,22 +444,22 @@ static std::string _blaDivPositive(const char* lhs, int lint, int ldot, int lfra
 			dig++;
 		}
 
-		result[cur_pos++] = dig;
+		result[curPos++] = dig;
 
-		if (cur_pow == 0) {
-			resdot = cur_pos;
+		if (curPow == 0) {
+			resdot = curPos;
 			if (scale > 0) {
-				result[cur_pos++] = '.';
+				result[curPos++] = '.';
 			}
-			resfrac = cur_pos;
+			resfrac = curPos;
 		}
-		cur_pow--;
+		curPow--;
 		beg++;
 	}
-	resscale = cur_pos - resfrac;
+	resscale = curPos - resfrac;
 
-	divider -= divider_skip;
-	divider_len += divider_skip;
+	divider -= dividerSkip;
+	dividerLen += dividerSkip;
 	free(dividend);
 	free(divider);
 
@@ -586,6 +586,7 @@ Blamath Blamath::operator^(const Blamath& bla) {
 }
 Blamath Blamath::operator=(const std::string& bla) {
 	//TODO =
+	return Blamath();
 }
 
 void Blamath::operator+=(const Blamath& bla) {
@@ -765,17 +766,17 @@ std::string Blamath::blaMod(const std::string& lhs, const std::string& rhs) {
 	}
 
 	char buffer[20];
-	int cur_pos = 20;
+	int curPos = 20;
 	do {
-		buffer[--cur_pos] = (char)(res % 10 + '0');
+		buffer[--curPos] = (char)(res % 10 + '0');
 		res /= 10;
 	} while (res > 0);
 
 	if (lsign < 0) {
-		buffer[--cur_pos] = '-';
+		buffer[--curPos] = '-';
 	}
 
-	return std::string(std::string(buffer + cur_pos).substr(0, 20 - cur_pos));
+	return std::string(std::string(buffer + curPos).substr(0, 20 - curPos));
 }
 
 std::string Blamath::blaPow(const std::string& lhs, const std::string& rhs) {
