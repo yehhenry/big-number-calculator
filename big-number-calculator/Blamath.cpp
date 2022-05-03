@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#pragma region Internal
+
 static int _blaScale = 100;
 
 static const std::string ONE("1");
@@ -498,7 +500,154 @@ static std::string _blaAdd(const char* lhs, int lsign, int lint, int ldot, int l
 	}
 
 	BLA_ASSERT(0);
-	return ZERO; //Is dummy...
+	return ZERO;
+}
+#pragma endregion
+
+#pragma region Constructor
+
+Blamath::Blamath() { }
+
+Blamath::Blamath(const Blamath& bla) {
+	this->value = bla.value;
+}
+
+Blamath::Blamath(const char* num) {
+	this->value = num;
+}
+
+Blamath::Blamath(std::string num) {
+	this->value = num;
+}
+
+Blamath::Blamath(int num) {
+	std::stringstream ss;
+	ss << num;
+	this->value = ss.str();
+}
+
+Blamath::Blamath(long long num) {
+	std::stringstream ss;
+	ss << num;
+	this->value = ss.str();
+}
+
+Blamath::Blamath(unsigned int num) {
+	std::stringstream ss;
+	ss << num;
+	this->value = ss.str();
+}
+
+Blamath::Blamath(unsigned long long num) {
+	std::stringstream ss;
+	ss << num;
+	this->value = ss.str();
+}
+
+Blamath::Blamath(float num) {
+	std::stringstream ss;
+	ss << num;
+	this->value = ss.str();
+}
+
+Blamath::Blamath(double num) {
+	std::stringstream ss;
+	ss << num;
+	this->value = ss.str();
+}
+
+Blamath::Blamath(long double num) {
+	std::stringstream ss;
+	ss << num;
+	this->value = ss.str();
+}
+
+#pragma endregion
+
+#pragma region Operation
+
+Blamath Blamath::operator+(const Blamath& bla) {
+	return Blamath::blaAdd(this->value, bla.value);
+}
+Blamath Blamath::operator-(const Blamath& bla) {
+	return Blamath::blaSub(this->value, bla.value);
+}
+Blamath Blamath::operator*(const Blamath& bla) {
+	return Blamath::blaMul(this->value, bla.value);
+}
+Blamath Blamath::operator/(const Blamath& bla) {
+	return Blamath::blaDiv(this->value, bla.value);
+}
+Blamath Blamath::operator%(const Blamath& bla) {
+	return Blamath::blaMod(this->value, bla.value);
+}
+Blamath Blamath::operator^(const Blamath& bla) {
+	return Blamath::blaPow(this->value, bla.value);
+}
+Blamath Blamath::operator=(const std::string& bla) {
+	//TODO =
+}
+
+void Blamath::operator+=(const Blamath& bla) {
+	this->value = Blamath::blaAdd(this->value, bla.value);
+}
+void Blamath::operator-=(const Blamath& bla) {
+	this->value = Blamath::blaSub(this->value, bla.value);
+}
+void Blamath::operator*=(const Blamath& bla) {
+	this->value = Blamath::blaMul(this->value, bla.value);
+}
+void Blamath::operator/=(const Blamath& bla) {
+	this->value = Blamath::blaDiv(this->value, bla.value);
+}
+void Blamath::operator^=(const Blamath& bla) {
+	this->value = Blamath::blaPow(this->value, bla.value);
+}
+
+bool Blamath::operator > (const Blamath& bla) {
+	return Blamath::blaCompare(this->value, bla.value) > 0;
+}
+bool Blamath::operator >= (const Blamath& bla) {
+	return Blamath::blaCompare(this->value, bla.value) >= 0;
+}
+bool Blamath::operator == (const Blamath& bla) {
+	return Blamath::blaCompare(this->value, bla.value) == 0;
+}
+bool Blamath::operator < (const Blamath& bla) {
+	return Blamath::blaCompare(this->value, bla.value) < 0;
+}
+bool Blamath::operator <= (const Blamath& bla) {
+	return Blamath::blaCompare(this->value, bla.value) <= 0;
+}
+
+std::istream& operator>>(std::istream& is, Blamath& o) {
+	//TODO >>
+	is >> o;
+
+	return is;
+}
+std::ostream& operator<<(std::ostream& os, Blamath& o) {
+	if (o.isInteger) {
+		os << o.getIntPart();
+	}
+	else {
+		os << o.toString();
+	}
+
+	return os;
+}
+
+#pragma endregion
+
+#pragma region Public
+
+std::string Blamath::toString() {
+	return this->value;
+}
+
+void Blamath::round(int scale) {
+	if (scale >= 1)
+		this->value = Blamath::blaRound(this->value, scale);
 }
 
 Blamath Blamath::getFactorial() {
@@ -508,6 +657,28 @@ Blamath Blamath::getFactorial() {
 	}
 
 	return result;
+}
+
+std::string Blamath::getIntPart() {
+	std::size_t dot = this->value.find('.');
+	if (dot != std::string::npos) {
+		if (dot == 0)
+			return std::string("0");
+		if (dot == 1 && this->value[0] == '-')
+			return std::string("-0");
+		return this->value.substr(0, dot);
+	}
+	else {
+		return this->value;
+	}
+}
+
+std::string Blamath::getDecPart() {
+	std::size_t dot = this->value.find('.');
+	if (dot != std::string::npos)
+		return this->value.length() > dot + 1 ? this->value.substr(dot + 1) : std::string("0");
+	else
+		return std::string("0");
 }
 
 void Blamath::blaScale(int scale) {
@@ -577,7 +748,7 @@ std::string Blamath::blaMod(const std::string& lhs, const std::string& rhs) {
 	}
 
 	if (rdot - rint > 18 || mod == 0) {
-		std::cerr << "Second parameter \"" << rhs.c_str() << "\" in function bcmod is not a non zero integer less than 1e18 by absolute value" << std::endl;
+		std::cerr << "Second parameter \"" << rhs.c_str() << "\" in function bcmod is not a non zero integer less than 1e18 by absolute this->value" << std::endl;
 		return ZERO;
 	}
 
@@ -817,3 +988,4 @@ std::string Blamath::blaRound(const std::string& lhs, int scale) {
 
 	return ret;
 }
+#pragma endregion

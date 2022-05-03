@@ -21,9 +21,21 @@
     <ClCompile Include="Blamath.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
+    <ClCompile Include="Integer.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="Decimal.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Blamath.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="Integer.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="Decimal.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>
