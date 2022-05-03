@@ -8,6 +8,8 @@
 class Blamath {
 
 public:
+	bool isInteger = true;
+
 	Blamath() { }
 	Blamath(const Blamath& o) : value(o.value) { }
 	Blamath(const char* num) : value(num) {  }
@@ -44,6 +46,10 @@ public:
 		return Blamath::blaPow(value, o.value);
 	}
 
+	Blamath operator=(const std::string& o) {
+		//TODO =
+	}
+
 	void operator+=(const Blamath& o) {
 		value = Blamath::blaAdd(value, o.value);
 	}
@@ -74,6 +80,24 @@ public:
 	}
 	bool operator <= (const Blamath& o) {
 		return Blamath::blaCompare(value, o.value) <= 0;
+	}
+
+	friend std::istream& operator>>(std::istream& is, Blamath& o) {
+		//TODO >>
+		is >> o;
+
+		return is;
+	}
+
+	friend std::ostream& operator<<(std::ostream& os, Blamath& o) {
+		if (o.isInteger) {
+			os << o.getIntPart();
+		}
+		else {
+			os << o.toString();
+		}
+
+		return os;
 	}
 
 	std::string toString() {
