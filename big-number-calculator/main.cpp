@@ -83,7 +83,7 @@ void infixToPostfix(string str) {
 	for (int i = 0; i < str.length(); i++) {
 		char c = str[i];
 		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
-			while ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
+			while ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '.') {
 				result = result + c;
 				i++;
 				c = str[i];
