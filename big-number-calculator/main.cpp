@@ -47,7 +47,7 @@ int precc(char c)
 }
 
 void infixToPostfix(string str) {
-	stack<string> st;
+	stack<string> st; 
 	string result;
 
 	for (int i = 0; i < str.length(); i++) {
@@ -64,6 +64,7 @@ void infixToPostfix(string str) {
 		if (c == '(') {
 			st.push("(");
 		}
+
 		else if (c == ')') {
 			while (st.top() != "(") {
 				res.push_back(st.top());
@@ -71,11 +72,11 @@ void infixToPostfix(string str) {
 			}
 			st.pop();
 		}
+
 		else {
 			while (!st.empty() && precc(str[i]) <= prec(st.top())) {
-				if (c == '!' && st.top() == "!") {
+				if (c == '!' && st.top() == "!")
 					break;
-				}
 				else {
 					res.push_back(st.top());
 					st.pop();
@@ -91,7 +92,6 @@ void infixToPostfix(string str) {
 		res.push_back(st.top());
 		st.pop();
 	}
-
 }
 
 string calculate(Blamath a, Blamath b, const std::string operatorSign)
@@ -119,22 +119,25 @@ string calculate(Blamath a, Blamath b, const std::string operatorSign)
 	}
 
 }
-// POSTFIX evaluation to get result
+
 static std::string evaluatePostfixExpression()
 {
 	stack <string> myStack;
 	string str;
-	for (int i = 0, j = res.size() - 1,index=0; i < j; i++,index++)
+	char c = res[res.size() - 1][0];
+	int j = 0;
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '!' || c == '^' || c == '*' || c == '/' || c == '+' || c == '-') {
+		j = res.size();
+	}
+	else {
+		j = res.size() - 1;
+	}
+	for (int i = 0; i < j; i++)
 	{
-		str = res[index];
-		if (index + 1 <= j) {
-			if (res[index + 1] == "!") {
-				i--;
-			}
-		}
-		
+		str = res[i];
+
 		if (str != "!" && str != "^" && str != "*" && str != "/" && str != "+" && str != "-") {
-			myStack.push(res[index]);
+			myStack.push(res[i]);
 		}
 		else if (str == "!") {
 			Blamath a(myStack.top());
@@ -180,11 +183,12 @@ int main() {
 		cout << "Postfix Expression: ";
 		//verify result
 		for (int i = 0; i < res.size(); i++) {
-			cout << res[i];
+			//cout << "res[" << i << "]  = " << res[i] << "　";
+			cout << res[i] ;
 		}
 		cout << endl;
 		ans = evaluatePostfixExpression();
-		cout << ans << endl;
+		cout << "ans = " << ans << endl;
 		res.clear();
 	}
 }
