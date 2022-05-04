@@ -11,6 +11,7 @@ static int _blaScale = 100;
 static const std::string ONE("1");
 static const std::string ZERO("0");
 
+
 static void blaNoassert() { }
 static void blaAssert(const char* assertion, const char* file, int line) {
 	std::cerr << "Critical Error in: " << assertion << ", File '" << file << "' in line " << line << "." << std::endl;
