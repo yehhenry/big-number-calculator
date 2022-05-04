@@ -4,6 +4,7 @@
 #include<string>
 #include<iostream>
 #include<sstream>
+using namespace std;
 
 class Blamath {
 
@@ -78,4 +79,5 @@ public:
 	static std::string blaRound(const std::string& lhs, int scale = INT_MIN);
 	// 比較兩個數的大小
 	static int blaCompare(const std::string& lhs, const std::string& rhs, int scale = INT_MIN);
+
 };
