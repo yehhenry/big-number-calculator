@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <stack>
+#include <algorithm>
 #include "Blamath.h"
 #include "Decimal.h"
 #include "Integer.h"
@@ -9,36 +10,20 @@ using namespace std;
 
 vector<string> res;
 
-int prec(string c) {
+int precedenceByString(string c) {
 	if (c == "!") {
-		return 4;
+		return 5;
 	}
 	else if (c == "^") {
-		return 3;
-	}
-	else if (c == "*" || c == "/") {
-		return 2;
-	}
-	else if (c == "+" || c == "-") {
-		return 1;
-	}
-	else {
-		return -1;
-	}
-}
-
-int precc(char c)
-{
-	if (c == '!') {
 		return 4;
 	}
-	else if (c == '^') {
+	else if (c == "*" || c == "/") {
 		return 3;
 	}
-	else if (c == '*' || c == '/') {
+	else if (c == "+" || c == "-") {
 		return 2;
 	}
-	else if (c == '+' || c == '-') {
+	else if (c == ",") {
 		return 1;
 	}
 	else {
@@ -46,9 +31,54 @@ int precc(char c)
 	}
 }
 
+int precedenceByChar(char c)
+{
+	if (c == '!') {
+		return 5;
+	}
+	else if (c == '^') {
+		return 4;
+	}
+	else if (c == '*' || c == '/') {
+		return 3;
+	}
+	else if (c == '+' || c == '-') {
+		return 2;
+	}
+	else if (c == ',') {
+		return 1;
+	}
+	else {
+		return -1;
+	}
+}
+
+void replaceAll(string& s, string const& toReplace, string const& replaceWith) {
+	ostringstream oss;
+	size_t pos = 0;
+	size_t prevPos = pos;
+
+	while (true) {
+		prevPos = pos;
+		pos = s.find(toReplace, pos);
+		if (pos == string::npos)
+			break;
+		oss << s.substr(prevPos, pos - prevPos);
+		oss << replaceWith;
+		pos += toReplace.size();
+	}
+
+	oss << s.substr(prevPos);
+	s = oss.str();
+}
+
+
 void infixToPostfix(string str) {
-	stack<string> st; 
+	stack<string> st;
 	string result;
+
+	str.erase(remove(str.begin(), str.end(), ' '), str.end()); // 移除空白
+	replaceAll(str, "Power", "");
 
 	for (int i = 0; i < str.length(); i++) {
 		char c = str[i];
@@ -64,7 +94,6 @@ void infixToPostfix(string str) {
 		if (c == '(') {
 			st.push("(");
 		}
-
 		else if (c == ')') {
 			while (st.top() != "(") {
 				res.push_back(st.top());
@@ -72,9 +101,8 @@ void infixToPostfix(string str) {
 			}
 			st.pop();
 		}
-
 		else {
-			while (!st.empty() && precc(str[i]) <= prec(st.top())) {
+			while (!st.empty() && precedenceByChar(str[i]) <= precedenceByString(st.top())) {
 				if (c == '!' && st.top() == "!")
 					break;
 				else {
@@ -94,8 +122,7 @@ void infixToPostfix(string str) {
 	}
 }
 
-string calculate(Blamath a, Blamath b, const std::string operatorSign)
-{
+string calculate(Blamath a, Blamath b, const std::string operatorSign) {
 	Blamath temp;
 	if (operatorSign == "+") {
 		temp = a + b;
@@ -117,16 +144,18 @@ string calculate(Blamath a, Blamath b, const std::string operatorSign)
 		temp = a ^ b;
 		return temp.toString();
 	}
-
+	else if (operatorSign == ",") {
+		temp = a ^ b;
+		return temp.toString();
+	}
 }
 
-static std::string evaluatePostfixExpression()
-{
+static std::string evaluatePostfixExpression() {
 	stack <string> myStack;
 	string str;
 	char c = res[res.size() - 1][0];
 	int j = 0;
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '!' || c == '^' || c == '*' || c == '/' || c == '+' || c == '-') {
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '!' || c == '^' || c == '*' || c == '/' || c == '+' || c == '-' || c == ',') {
 		j = res.size();
 	}
 	else {
@@ -136,7 +165,7 @@ static std::string evaluatePostfixExpression()
 	{
 		str = res[i];
 
-		if (str != "!" && str != "^" && str != "*" && str != "/" && str != "+" && str != "-") {
+		if (str != "!" && str != "^" && str != "*" && str != "/" && str != "+" && str != "-" && str != ",") {
 			myStack.push(res[i]);
 		}
 		else if (str == "!") {
@@ -144,7 +173,7 @@ static std::string evaluatePostfixExpression()
 			myStack.pop();
 			myStack.push(a.getFactorial().toString());
 		}
-		else if (str == "^" || str == "*" || str == "/" || str == "+" || str == "-") //found operator
+		else if (str == "^" || str == "*" || str == "/" || str == "+" || str == "-" || str == ",") //found operator
 		{
 
 			Blamath b(myStack.top());
@@ -158,7 +187,6 @@ static std::string evaluatePostfixExpression()
 	}
 	return myStack.top();
 }
-
 
 int main() {
 	Blamath a(25);
@@ -184,7 +212,7 @@ int main() {
 		//verify result
 		for (int i = 0; i < res.size(); i++) {
 			//cout << "res[" << i << "]  = " << res[i] << "　";
-			cout << res[i] ;
+			cout << res[i];
 		}
 		cout << endl;
 		ans = evaluatePostfixExpression();
