@@ -696,6 +696,7 @@ Blamath::Blamath() {
 
 Blamath::Blamath(const Blamath& bla) {
 	this->value = bla.value;
+	this->isInteger = bla.isInteger;
 }
 
 Blamath::Blamath(const char* num) {
@@ -755,22 +756,46 @@ Blamath::Blamath(long double num) {
 #pragma region Operation
 
 Blamath Blamath::operator+(const Blamath& bla) {
-	return Blamath::blaAdd(this->value, bla.value);
+	Blamath r = Blamath::blaAdd(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 Blamath Blamath::operator-(const Blamath& bla) {
-	return Blamath::blaSub(this->value, bla.value);
+	Blamath r = Blamath::blaSub(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 Blamath Blamath::operator*(const Blamath& bla) {
-	return Blamath::blaMul(this->value, bla.value);
+	Blamath r = Blamath::blaMul(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 Blamath Blamath::operator/(const Blamath& bla) {
-	return Blamath::blaDiv(this->value, bla.value);
+	Blamath r = Blamath::blaDiv(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 Blamath Blamath::operator%(const Blamath& bla) {
-	return Blamath::blaMod(this->value, bla.value);
+	Blamath r = Blamath::blaMod(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 Blamath Blamath::operator^(const Blamath& bla) {
-	return Blamath::blaPow(this->value, bla.value);
+	Blamath r = Blamath::blaPow(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 
 void Blamath::operator+=(const Blamath& bla) {
