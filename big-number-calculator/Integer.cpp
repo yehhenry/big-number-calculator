@@ -1,6 +1,10 @@
 #include "Integer.h"
 
-Integer::Integer(const Blamath& o) :Blamath(o) {
+Integer::Integer() :Blamath() {
+	Blamath::isInteger = true;
+}
+
+Integer::Integer(const Blamath& o) : Blamath(o) {
 	Blamath::isInteger = true;
 }
 

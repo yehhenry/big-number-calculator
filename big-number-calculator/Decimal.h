@@ -3,7 +3,9 @@
 #include "Blamath.h"
 
 class Decimal :public Blamath {
+
 public:
+	Decimal();
 	Decimal(const Blamath& o);
 	Decimal(const char* num);
 	Decimal(std::string num);
@@ -14,4 +16,12 @@ public:
 	Decimal(float num);
 	Decimal(double num);
 	Decimal(long double num);
+
+	Decimal operator+(const Blamath& bla);
+	Decimal operator-(const Blamath& bla);
+	Decimal operator*(const Blamath& bla);
+	Decimal operator/(const Blamath& bla);
+	Decimal operator%(const Blamath& bla);
+	Decimal operator^(const Blamath& bla);
+
 };
