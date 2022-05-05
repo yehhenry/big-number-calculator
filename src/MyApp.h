@@ -13,7 +13,7 @@
 #include <map>
 #include <array>
 #include <stdio.h>
-#include "Blamath.h"
+#include "../big-number-calculator/Blamath.h"
 
 using namespace std;
 using namespace ultralight;

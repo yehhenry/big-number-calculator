@@ -100,7 +100,7 @@ void MyApp::OnFinishLoading(ultralight::View* caller,
 bool MyApp::IsNumber(const std::string& s)
 {
     std::string::const_iterator it = s.begin();
-    while (it != s.end() && (std::isdigit(*it) || *it == '-' || *it == '(' || *it == '.')) ++it;
+    while (it != s.end() && (std::isdigit(*it) || *it == '-' || *it == '.')) ++it;
     return !s.empty() && it == s.end();
 }
 
@@ -140,13 +140,7 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
         }else if(thisArgStr == "-") {
             if (input.size() > 0) {
                 if (IsNumber(input[input.size() - 1])) {
-                    std::ostringstream oss;
-                    if (input[input.size() - 1][(input[input.size() - 1]).size() - 1] == '(') {
-                        input[input.size() - 1] = '(' + input[input.size() - 1];
-                    }else {
-                        oss << stof(input[input.size() - 1]) * -1;
-                        input[input.size() - 1] = oss.str();
-                    }
+                    input[input.size() - 1] = to_string((stoi(input[input.size() - 1]) * -1));
                 }
             }
         }else if (thisArgStr == "=" && isEdit) {
