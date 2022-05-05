@@ -9,7 +9,7 @@ static int _blaScale = 100;
 static const std::string ONE("1");
 static const std::string ZERO("0");
 
-// ³z¹L¦r¦ê¨ú±o²Å¸¹¶¥¼h
+// é€éå­—ä¸²å–å¾—ç¬¦è™Ÿéšå±¤
 int precedenceByString(string c) {
 	if (c == "!") {
 		return 5;
@@ -31,7 +31,7 @@ int precedenceByString(string c) {
 	}
 }
 
-// ³z¹L¦r¤¸¨ú±o²Å¸¹¶¥¼h
+// é€éå­—å…ƒå–å¾—ç¬¦è™Ÿéšå±¤
 int precedenceByChar(char c)
 {
 	if (c == '!') {
@@ -54,7 +54,7 @@ int precedenceByChar(char c)
 	}
 }
 
-// ±N©Ò¦³«ü©wªº¦r¦ê¨ú¥N¬°·sªº¦r¦ê
+// å°‡æ‰€æœ‰æŒ‡å®šçš„å­—ä¸²å–ä»£ç‚ºæ–°çš„å­—ä¸²
 void replaceAll(string& s, string const& toReplace, string const& replaceWith) {
 	ostringstream oss;
 	size_t pos = 0;
@@ -74,14 +74,14 @@ void replaceAll(string& s, string const& toReplace, string const& replaceWith) {
 	s = oss.str();
 }
 
-// ±Nºâ¦¡Âà´«¬°«á§Ç¦¡
+// å°‡ç®—å¼è½‰æ›ç‚ºå¾Œåºå¼
 vector<string> infixToPostfix(string str) {
 	stack<string> st;
 	string result;
 	vector<string> res;
 
-	str.erase(remove(str.begin(), str.end(), ' '), str.end()); // ²¾°£ªÅ¥Õ
-	replaceAll(str, "Power", ""); // ²M°£ Power
+	str.erase(remove(str.begin(), str.end(), ' '), str.end()); // ç§»é™¤ç©ºç™½
+	replaceAll(str, "Power", ""); // æ¸…é™¤ Power
 
 	for (int i = 0; i < str.length(); i++) {
 		char c = str[i];
@@ -132,7 +132,7 @@ vector<string> infixToPostfix(string str) {
 	return res;
 }
 
-// ³z¹L«ü©wªº²Å¸¹¨ú±o¨â¼Æ­pºâªºµ²ªG
+// é€éæŒ‡å®šçš„ç¬¦è™Ÿå–å¾—å…©æ•¸è¨ˆç®—çš„çµæœ
 string calculate(Blamath a, Blamath b, const std::string operatorSign) {
 	Blamath temp;
 	if (operatorSign == "+") {
@@ -161,7 +161,7 @@ string calculate(Blamath a, Blamath b, const std::string operatorSign) {
 	}
 }
 
-// ¨ú±o«á§Ç¦¡¹Bºâ«áªºµ²ªG
+// å–å¾—å¾Œåºå¼é‹ç®—å¾Œçš„çµæœ
 string evaluatePostfixExpression(vector<string> res) {
 	stack <string> myStack;
 	string str;
@@ -694,9 +694,82 @@ Blamath::Blamath(const Blamath& bla) {
 	this->isInteger = bla.isInteger;
 }
 
+map<string, string> Blamath::getLayer1SubEquations(string equation) {
+	/*
+		// JavaScript Version
+		let stackStr = []; // æ‰¾åˆ°çš„æœ€å°å±¤é‹ç®—å¼
+		let cache = ""; // å¿«å–
+		let finding = false; // é–‹å§‹å°‹æ‰¾
+		a.split("").forEach(e => {
+			if (e == "(") {
+				finding = true;
+			}else if (e == ")"){
+				finding = false;
+				stackStr.push(cache);
+				cache = "";
+			}
+			if (e != "(" && e != ")" && finding) {
+				cache += e;
+			}
+		})
+		console.log(stackStr);
+	*/
+	map<string, string> equationStack;
+	string cache = "";
+	bool finding = false;
+	for (const char& item : equation) {
+		if (item == '(') {
+			finding = true;
+		}
+		else if (item == ')' && finding && cache != "") {
+			finding = false;
+			Blamath newEquation = cache;
+			string originalEquation = '(' + cache + ')';
+			if (equationStack.find(originalEquation) == equationStack.end()) {
+				equationStack[originalEquation] = newEquation.getValue();
+			}
+			cache = "";
+		}
+
+		if (item != '(' && item != ')' && finding) {
+			cache += item;
+		}
+	}
+	return equationStack;
+}
+
+int Blamath::getSubEquaCount(string eqation) {
+	int leftPair = 0;
+	int rightPair = 0;
+	for (const char& item : eqation) {
+		if (item == '(') {
+			leftPair++;
+		}
+		else if (item == ')') {
+			rightPair++;
+		}
+	}
+	return leftPair != rightPair ? -1 : leftPair;
+}
+
 Blamath::Blamath(const char* num) {
-	// TODO 
-	this->value = evaluatePostfixExpression(infixToPostfix(num));
+	// TODO
+	this->originalEquation = num;
+	string equation = num;
+	replaceAll(equation, " ", "");
+	int subEquationCount = getSubEquaCount(equation);
+	if (subEquationCount < 0) {
+		this->value = ZERO;
+		return;
+	}
+	while (getSubEquaCount(equation) > 0) {
+		map<string, string> layer1Equations = getLayer1SubEquations(equation);
+		for (const auto& item : layer1Equations) {
+			replaceAll(equation, item.first, item.second);
+		}
+		replaceAll(equation, "--", "");
+	}
+	this->value = evaluatePostfixExpression(infixToPostfix(equation));
 	this->value = blaAdd(this->value, ZERO);
 	string temp = this->value.substr(this->value.find(".") + 1);
 	for (char& c : temp) {
@@ -707,9 +780,24 @@ Blamath::Blamath(const char* num) {
 	}
 }
 
+
 Blamath::Blamath(std::string num) {
-	// TODO 
-	this->value = evaluatePostfixExpression(infixToPostfix(num)); // num = -5.0 + 1 * 50 => 45 
+	// TODO
+	string equation = num;
+	replaceAll(equation, " ", "");
+	int subEquationCount = getSubEquaCount(equation);
+	if (subEquationCount < 0) {
+		this->value = ZERO;
+		return;
+	}
+	while (getSubEquaCount(equation) > 0) {
+		map<string, string> layer1Equations = getLayer1SubEquations(equation);
+		for (const auto& item : layer1Equations) {
+			replaceAll(equation, item.first, item.second);
+		}
+		replaceAll(equation, "--", "");
+	}
+	this->value = evaluatePostfixExpression(infixToPostfix(equation)); // num = -5.0 + 1 * 50 => 45 
 	this->value = blaAdd(this->value, ZERO);
 	string temp = this->value.substr(this->value.find(".") + 1);
 	for (char& c : temp) {
