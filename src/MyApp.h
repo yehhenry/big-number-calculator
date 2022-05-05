@@ -8,6 +8,7 @@
 #include <string>
 #include <functional>
 #include <map>
+#include<stdio.h>
 
 using namespace std;
 using namespace ultralight;
@@ -35,32 +36,33 @@ public:
 
     // This is called when the page finishes a load in one of its frames.
     virtual void OnFinishLoading(ultralight::View* caller,
-                               uint64_t frame_id,
-                               bool is_main_frame,
-                               const String& url) override;
+                                 uint64_t frame_id,
+                                 bool is_main_frame,
+                                 const String& url) override;
 
     // This is called when the DOM has loaded in one of its frames.
     virtual void OnDOMReady(ultralight::View* caller,
-                          uint64_t frame_id,
-                          bool is_main_frame,
-                          const String& url) override;
+                            uint64_t frame_id,
+                            bool is_main_frame,
+                            const String& url) override;
 
     // This is called when the page requests to change the Cursor.
     virtual void OnChangeCursor(ultralight::View* caller,
-    Cursor cursor) override;
+                                Cursor cursor) override;
 
     virtual void OnChangeTitle(ultralight::View* caller,
-    const String& title) override;
+                               const String& title) override;
 
-    virtual std::string JSStringToStdString(JSStringRef);
+    static std::string JSStringToStdString(JSStringRef);
 
-    JSValueRef OnButtonClick(JSContextRef, JSObjectRef, JSObjectRef, size_t,const JSValueRef[], JSValueRef*);
+    static JSValueRef OnButtonClick(JSContextRef, JSObjectRef, JSObjectRef, size_t,const JSValueRef[], JSValueRef*);
 
-    virtual std::string GetRenderTitleJS(string);
-    virtual std::string GetRenderSubtitleJS(string);
+    static bool IsNumber(const std::string&);
+    static void SetText(JSContextRef, string, string);
+
     // join method
     template <class T>
-    std::string join(T& val, std::string delim)
+    std::string static join(T& val, std::string delim)
     {
         std::string str;
         typename T::iterator it;
@@ -76,9 +78,7 @@ public:
         return str;
     }
 
-    vector<string> input;
-    vector<string> result;
-    bool isInput = true;
+
 protected:
     RefPtr<App> app_;
     RefPtr<Window> window_;
