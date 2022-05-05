@@ -1,17 +1,21 @@
 #pragma once
 #pragma warning(disable : 4996)
 
-#include<string>
 #include<iostream>
 #include<sstream>
+#include <algorithm>
+#include <string>
+#include <stdlib.h>
+#include <stack>
+#include <vector>
+
+using namespace std;
 
 class Blamath {
 
 protected:
 	bool isInteger = true;
-
-private:
-	std::string value;
+	string value = "0";
 
 public:
 	Blamath();
@@ -32,7 +36,6 @@ public:
 	Blamath operator/(const Blamath& bla);
 	Blamath operator%(const Blamath& bla);
 	Blamath operator^(const Blamath& bla);
-	Blamath operator=(const std::string& bla);
 
 	void operator+=(const Blamath& bla);
 	void operator-=(const Blamath& bla);
@@ -47,18 +50,18 @@ public:
 	bool operator <= (const Blamath& bla);
 
 	friend std::istream& operator>>(std::istream& is, Blamath& bla);
-	friend std::ostream& operator<<(std::ostream& os, Blamath& bla);
+	friend std::ostream& operator<<(std::ostream& os, const Blamath& bla);
 
 	// 取得完整數字字串
-	std::string toString();
+	std::string toString() const;
 	// 四捨五入到指定小數點後位數
 	void round(int scale);
 	// 取得階層
 	Blamath getFactorial();
 	// 取得整數部分的字串
-	std::string getIntPart();
+	std::string getIntPart() const;
 	// 取得小數點後部分的字串
-	std::string getDecPart();
+	std::string getDecPart() const;
 
 	// 設定保留的小數後位數
 	static void blaScale(int scale);
@@ -78,4 +81,5 @@ public:
 	static std::string blaRound(const std::string& lhs, int scale = INT_MIN);
 	// 比較兩個數的大小
 	static int blaCompare(const std::string& lhs, const std::string& rhs, int scale = INT_MIN);
+
 };

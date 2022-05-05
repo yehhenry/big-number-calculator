@@ -1,8 +1,6 @@
 #define BLA_ASSERT(cond) ((!(cond)) ? blaAssert(#cond,__FILE__,__LINE__) : blaNoassert())
 
 #include "Blamath.h"
-#include <string.h>
-#include <stdlib.h>
 
 #pragma region Internal
 
@@ -10,6 +8,192 @@ static int _blaScale = 100;
 
 static const std::string ONE("1");
 static const std::string ZERO("0");
+
+vector<string> res;
+
+// 透過字串取得符號階層
+int precedenceByString(string c) {
+	if (c == "!") {
+		return 5;
+	}
+	else if (c == "^") {
+		return 4;
+	}
+	else if (c == "*" || c == "/") {
+		return 3;
+	}
+	else if (c == "+" || c == "-") {
+		return 2;
+	}
+	else if (c == ",") {
+		return 1;
+	}
+	else {
+		return -1;
+	}
+}
+
+// 透過字元取得符號階層
+int precedenceByChar(char c)
+{
+	if (c == '!') {
+		return 5;
+	}
+	else if (c == '^') {
+		return 4;
+	}
+	else if (c == '*' || c == '/') {
+		return 3;
+	}
+	else if (c == '+' || c == '-') {
+		return 2;
+	}
+	else if (c == ',') {
+		return 1;
+	}
+	else {
+		return -1;
+	}
+}
+
+// 將所有指定的字串取代為新的字串
+void replaceAll(string& s, string const& toReplace, string const& replaceWith) {
+	ostringstream oss;
+	size_t pos = 0;
+	size_t prevPos = pos;
+
+	while (true) {
+		prevPos = pos;
+		pos = s.find(toReplace, pos);
+		if (pos == string::npos)
+			break;
+		oss << s.substr(prevPos, pos - prevPos);
+		oss << replaceWith;
+		pos += toReplace.size();
+	}
+
+	oss << s.substr(prevPos);
+	s = oss.str();
+}
+
+// 將算式轉換為後序式
+void infixToPostfix(string str) {
+	stack<string> st;
+	string result;
+
+	str.erase(remove(str.begin(), str.end(), ' '), str.end()); // 移除空白
+	replaceAll(str, "Power", ""); // 清除 Power
+
+	res.clear();
+	for (int i = 0; i < str.length(); i++) {
+		char c = str[i];
+		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
+			while ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '.') {
+				result = result + c;
+				i++;
+				c = str[i];
+			}
+			res.push_back(result);
+			result.clear();
+		}
+		if (c == '(') {
+			st.push("(");
+		}
+		else if (c == ')') {
+			while (st.top() != "(") {
+				res.push_back(st.top());
+				st.pop();
+			}
+			st.pop();
+		}
+		else {
+			while (!st.empty() && precedenceByChar(str[i]) <= precedenceByString(st.top())) {
+				if (c == '!' && st.top() == "!")
+					break;
+				else {
+					res.push_back(st.top());
+					st.pop();
+				}
+			}
+			result = c;
+			st.push(result);
+			result.clear();
+		}
+	}
+
+	while (!st.empty()) {
+		res.push_back(st.top());
+		st.pop();
+	}
+}
+
+// 透過指定的符號取得兩數計算的結果
+string calculate(Blamath a, Blamath b, const std::string operatorSign) {
+	Blamath temp;
+	if (operatorSign == "+") {
+		temp = a + b;
+		return temp.toString();
+	}
+	else if (operatorSign == "-") {
+		temp = a - b;
+		return temp.toString();
+	}
+	else if (operatorSign == "*") {
+		temp = a * b;
+		return temp.toString();
+	}
+	else if (operatorSign == "/") {
+		temp = a / b;
+		return temp.toString();
+	}
+	else if (operatorSign == "^") {
+		temp = a ^ b;
+		return temp.toString();
+	}
+	else if (operatorSign == ",") {
+		temp = a ^ b;
+		return temp.toString();
+	}
+}
+
+// 取得後序式運算後的結果
+string evaluatePostfixExpression() {
+	stack <string> myStack;
+	string str;
+	char c = res[res.size() - 1][0];
+	int j = 0;
+	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '!' || c == '^' || c == '*' || c == '/' || c == '+' || c == '-' || c == ',') {
+		j = res.size();
+	}
+	else {
+		j = res.size() - 1;
+	}
+	for (int i = 0; i < j; i++)
+	{
+		str = res[i];
+
+		if (str != "!" && str != "^" && str != "*" && str != "/" && str != "+" && str != "-" && str != ",") {
+			myStack.push(res[i]);
+		}
+		else if (str == "!") {
+			Blamath a(myStack.top());
+			myStack.pop();
+			myStack.push(a.getFactorial().toString());
+		}
+		else if (str == "^" || str == "*" || str == "/" || str == "+" || str == "-" || str == ",") //found operator
+		{
+
+			Blamath b(myStack.top());
+			myStack.pop();
+
+			Blamath a(myStack.top());
+			myStack.pop();
+
+			myStack.push(calculate(a, b, str));
+		}
+	}
+	return myStack.top();
+}
 
 static void blaNoassert() { }
 static void blaAssert(const char* assertion, const char* file, int line) {
@@ -506,18 +690,23 @@ static std::string _blaAdd(const char* lhs, int lsign, int lint, int ldot, int l
 
 #pragma region Constructor
 
-Blamath::Blamath() { }
+Blamath::Blamath() {
+	this->value = ZERO;
+}
 
 Blamath::Blamath(const Blamath& bla) {
 	this->value = bla.value;
+	this->isInteger = bla.isInteger;
 }
 
 Blamath::Blamath(const char* num) {
-	this->value = num;
+	infixToPostfix(num);
+	this->value = evaluatePostfixExpression();
 }
 
 Blamath::Blamath(std::string num) {
-	this->value = num;
+	infixToPostfix(num);
+	this->value = evaluatePostfixExpression();
 }
 
 Blamath::Blamath(int num) {
@@ -567,26 +756,46 @@ Blamath::Blamath(long double num) {
 #pragma region Operation
 
 Blamath Blamath::operator+(const Blamath& bla) {
-	return Blamath::blaAdd(this->value, bla.value);
+	Blamath r = Blamath::blaAdd(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 Blamath Blamath::operator-(const Blamath& bla) {
-	return Blamath::blaSub(this->value, bla.value);
+	Blamath r = Blamath::blaSub(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 Blamath Blamath::operator*(const Blamath& bla) {
-	return Blamath::blaMul(this->value, bla.value);
+	Blamath r = Blamath::blaMul(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 Blamath Blamath::operator/(const Blamath& bla) {
-	return Blamath::blaDiv(this->value, bla.value);
+	Blamath r = Blamath::blaDiv(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 Blamath Blamath::operator%(const Blamath& bla) {
-	return Blamath::blaMod(this->value, bla.value);
+	Blamath r = Blamath::blaMod(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 Blamath Blamath::operator^(const Blamath& bla) {
-	return Blamath::blaPow(this->value, bla.value);
-}
-Blamath Blamath::operator=(const std::string& bla) {
-	//TODO =
-	return Blamath();
+	Blamath r = Blamath::blaPow(this->value, bla.value);
+	if (!bla.isInteger) {
+		r.isInteger = false;
+	}
+	return r;
 }
 
 void Blamath::operator+=(const Blamath& bla) {
@@ -621,18 +830,19 @@ bool Blamath::operator <= (const Blamath& bla) {
 	return Blamath::blaCompare(this->value, bla.value) <= 0;
 }
 
-std::istream& operator>>(std::istream& is, Blamath& o) {
-	//TODO >>
-	is >> o;
-
+std::istream& operator>>(std::istream& is, Blamath& bla) {
+	string equ;
+	getline(is, equ);
+	infixToPostfix(equ);
+	bla.value = evaluatePostfixExpression();
 	return is;
 }
-std::ostream& operator<<(std::ostream& os, Blamath& o) {
-	if (o.isInteger) {
-		os << o.getIntPart();
+std::ostream& operator<<(std::ostream& os, const Blamath& bla) {
+	if (bla.isInteger) {
+		os << bla.getIntPart();
 	}
 	else {
-		os << o.toString();
+		os << bla.toString();
 	}
 
 	return os;
@@ -642,7 +852,7 @@ std::ostream& operator<<(std::ostream& os, Blamath& o) {
 
 #pragma region Public
 
-std::string Blamath::toString() {
+std::string Blamath::toString() const {
 	return this->value;
 }
 
@@ -660,7 +870,7 @@ Blamath Blamath::getFactorial() {
 	return result;
 }
 
-std::string Blamath::getIntPart() {
+std::string Blamath::getIntPart() const {
 	std::size_t dot = this->value.find('.');
 	if (dot != std::string::npos) {
 		if (dot == 0)
@@ -674,7 +884,7 @@ std::string Blamath::getIntPart() {
 	}
 }
 
-std::string Blamath::getDecPart() {
+std::string Blamath::getDecPart() const {
 	std::size_t dot = this->value.find('.');
 	if (dot != std::string::npos)
 		return this->value.length() > dot + 1 ? this->value.substr(dot + 1) : std::string("0");
