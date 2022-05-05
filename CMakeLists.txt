@@ -8,3 +8,8 @@ set(SOURCES "src/MyApp.h"
             "src/main.cpp")
 
 add_app("${SOURCES}")
+
+execute_process (
+    COMMAND bash -c "rm -rf ${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app")
+
+option(RECURSIVE_GENERATE "Recursive call to cmake" OFF)
