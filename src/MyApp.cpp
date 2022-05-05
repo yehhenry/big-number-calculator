@@ -1,10 +1,11 @@
+#include <array>
 #include "MyApp.h"
 
 #define WINDOW_WIDTH  660
 #define WINDOW_HEIGHT 820
 
 vector<string> input;
-vector<string> result;
+std::string result;
 bool isEdit = true;
 
 MyApp::MyApp() {
@@ -134,7 +135,7 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
         string thisArgStr = JSStringToStdString(thisArg);
         if (thisArgStr == "reset") {
             isEdit = true;
-            result.clear();
+            result = "";
             input.clear();
         }else if(thisArgStr == "-") {
             if (input.size() > 0) {
@@ -146,7 +147,7 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
             isEdit = false;
         }else if (thisArgStr == "<") {
             isEdit = true;
-            result.clear();
+            result = "";
             if (input.size() >= 1) {
                 input.pop_back();
             }
@@ -158,7 +159,7 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
             }
         }else if (thisArgStr == "edit") {
             isEdit = true;
-            result.clear();
+            result = "";
         }else {
             isEdit = true;
             if (input.size() >= 1) {
@@ -178,18 +179,36 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
         }else {
             SetText(ctx, ".main-number", join(input, ""));
         }
-        SetText(ctx, ".sub-number", join(result, ""));
+        SetText(ctx, ".sub-number", result);
     }else {
         // TODO: call Blamath program & fetch result
-        FILE * fp;
-        char buffer[65536];
-        fp=popen("whoami", "r");
-        fgets(buffer, sizeof(buffer), fp);
-        pclose(fp);
+//        std::string command("whoami");
+//        array<char, 128> buffer;
+//
+//        FILE* pipe = popen(command.c_str(), "r");
+//        if (!pipe)
+//        {
+//            return 0;
+//        }
+//        while (fgets(buffer.data(), 128, pipe) != NULL) {
+//            result += buffer.data();
+//            SetText(ctx, ".main-number", result);
+//        }
+//        cout << result << endl;
+////        result = "1231";
+//        // replace
+//        for (int index = 0; index < result.size(); index ++) {
+//            if (result[index] == '\n') {
+//                result[index] = ' ';
+//            }
+//        }
+        string task = join(input, "");
 
-        string blaResult = buffer; // fake result
+        Blamath bla(task);
+        stringstream ss;
+        ss << bla;
         SetText(ctx, ".sub-number", join(input, ""));
-        SetText(ctx, ".main-number", blaResult);
+        SetText(ctx, ".main-number", ss.str());
     }
     return JSValueMakeNull(ctx);
 }
@@ -217,7 +236,7 @@ void MyApp::OnDOMReady(ultralight::View* caller,
 
     // init display
     input.clear();
-    result.clear();
+    result = "";
     SetText(ctx, ".main-number", "0");
     SetText(ctx, ".sub-number", "");
 

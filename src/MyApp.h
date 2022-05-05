@@ -4,11 +4,16 @@
 #include <JavaScriptCore/JavaScript.h>
 #include <AppCore/Defines.h>
 
+#include <iostream>
 #include <vector>
+#include <sstream>
+#include <iomanip>
 #include <string>
 #include <functional>
 #include <map>
-#include<stdio.h>
+#include <array>
+#include <stdio.h>
+#include "Blamath.h"
 
 using namespace std;
 using namespace ultralight;

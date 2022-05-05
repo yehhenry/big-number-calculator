@@ -19,9 +19,9 @@ if (UNIX)
     set(ULTRALIGHT_LIBRARY_DIR "${SDK_ROOT}/bin")
   endif ()
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(PORT UltralightWin)
-    set(PLATFORM "win")
-    set(ULTRALIGHT_LIBRARY_DIR "${SDK_ROOT}/lib")
+  set(PORT UltralightWin)
+  set(PLATFORM "win")
+  set(ULTRALIGHT_LIBRARY_DIR "${SDK_ROOT}/lib")
 else ()
   message(FATAL_ERROR "Unknown OS '${CMAKE_SYSTEM_NAME}'")
 endif ()
@@ -35,13 +35,13 @@ endif ()
 set(S3_DOMAIN ".sfo2.cdn.digitaloceanspaces.com")
 
 ExternalProject_Add(UltralightSDK
-  URL https://ultralight-sdk${S3_DOMAIN}/ultralight-sdk-latest-${PLATFORM}-${ARCHITECTURE}.7z
-  SOURCE_DIR "${SDK_ROOT}"
-  BUILD_IN_SOURCE 1
-  CONFIGURE_COMMAND ""
-  BUILD_COMMAND ""
-  INSTALL_COMMAND ""
-)
+        URL https://ultralight-sdk${S3_DOMAIN}/ultralight-sdk-latest-${PLATFORM}-${ARCHITECTURE}.7z
+        SOURCE_DIR "${SDK_ROOT}"
+        BUILD_IN_SOURCE 1
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ""
+        INSTALL_COMMAND ""
+        )
 
 MACRO(ADD_APP source_list)
   set(APP_NAME ${CMAKE_PROJECT_NAME})
@@ -66,7 +66,7 @@ MACRO(ADD_APP source_list)
 
   if (APPLE)
     # Enable High-DPI on macOS through our custom Info.plist template
-    set_target_properties(${APP_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Info.plist.in) 
+    set_target_properties(${APP_NAME} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Info.plist.in)
   endif()
 
   if (MSVC)
@@ -76,37 +76,37 @@ MACRO(ADD_APP source_list)
 
   # Copy all binaries to target directory
   add_custom_command(TARGET ${APP_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_BINARY_DIR}" $<TARGET_FILE_DIR:${APP_NAME}>) 
+          COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_BINARY_DIR}" $<TARGET_FILE_DIR:${APP_NAME}>)
 
   # Set the assets path to "/assets" or "/../Resources/assets" on macOS
   if (APPLE)
     set(ASSETS_PATH "$<TARGET_FILE_DIR:${APP_NAME}>/../Resources/assets")
-#    execute_process (
-#      COMMAND bash -c "cp ${CMAKE_CURRENT_LIST_DIR}/Icon? ${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/"
-#      COMMAND bash -c "${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}"
-#    )
+    #    execute_process (
+    #      COMMAND bash -c "cp ${CMAKE_CURRENT_LIST_DIR}/Icon? ${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/"
+    #      COMMAND bash -c "${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}"
+    #    )
   else ()
-    set(ASSETS_PATH "$<TARGET_FILE_DIR:${APP_NAME}>/assets") 
+    set(ASSETS_PATH "$<TARGET_FILE_DIR:${APP_NAME}>/assets")
   endif ()
 
   # Copy assets to assets path
   add_custom_command(TARGET ${APP_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "${ASSETS_PATH}")
+          COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/assets/" "${ASSETS_PATH}")
 
   if(${ENABLE_INSPECTOR})
     # Copy inspector to assets directory
     add_custom_command(TARGET ${APP_NAME} POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_INSPECTOR_DIR}" "${ASSETS_PATH}/inspector")
+            COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_INSPECTOR_DIR}" "${ASSETS_PATH}/inspector")
   endif ()
 
   # Copy resources to assets directory
   add_custom_command(TARGET ${APP_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_RESOURCES_DIR}" "${ASSETS_PATH}/resources"
-#    COMMAND bash -c "cp ${CMAKE_CURRENT_LIST_DIR}/Icon? ${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/"
-#    COMMAND bash -c "${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}"
-  )
+          COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_RESOURCES_DIR}" "${ASSETS_PATH}/resources"
+          #    COMMAND bash -c "cp ${CMAKE_CURRENT_LIST_DIR}/Icon? ${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/"
+          #    COMMAND bash -c "${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}"
+          )
 
-    
+
   add_dependencies(${APP_NAME} UltralightSDK)
 
 ENDMACRO()
