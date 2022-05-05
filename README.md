@@ -10,7 +10,7 @@ macOS: ./GUI/BlaCalculate.app.zip
 解壓後即可get愛啪啪
 最低系統要求: macOS 12.0
 
-Windows: ./GUI/葉柏亨把路徑補上來，icon記得換
+Windows: ./build/Release/BlaCalculate.exe
 最低系統要求：Windows 11
 ```
 
