@@ -85,8 +85,10 @@ vector<string> infixToPostfix(string str) {
 
 	for (int i = 0; i < str.length(); i++) {
 		char c = str[i];
-		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
-			while ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '.') {
+		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9' ||
+			(c == '-' && i == 0) || (c == '-' && (str[i - 1] == '(' || str[i - 1] == '+' || str[i - 1] == '-' || str[i - 1] == '*' || str[i - 1] == '/')))) {
+			while ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '.' ||
+				(c == '-' && i == 0) || (c == '-' && (str[i - 1] == '(' || str[i - 1] == '+' || str[i - 1] == '-' || str[i - 1] == '*' || str[i - 1] == '/'))) {
 				result = result + c;
 				i++;
 				c = str[i];
@@ -693,6 +695,7 @@ Blamath::Blamath(const Blamath& bla) {
 }
 
 Blamath::Blamath(const char* num) {
+	// TODO 
 	this->value = evaluatePostfixExpression(infixToPostfix(num));
 	this->value = blaAdd(this->value, ZERO);
 	string temp = this->value.substr(this->value.find(".") + 1);
@@ -705,7 +708,8 @@ Blamath::Blamath(const char* num) {
 }
 
 Blamath::Blamath(std::string num) {
-	this->value = evaluatePostfixExpression(infixToPostfix(num));
+	// TODO 
+	this->value = evaluatePostfixExpression(infixToPostfix(num)); // num = -5.0 + 1 * 50 => 45 
 	this->value = blaAdd(this->value, ZERO);
 	string temp = this->value.substr(this->value.find(".") + 1);
 	for (char& c : temp) {

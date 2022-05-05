@@ -7,10 +7,8 @@ int main() {
 	//*****************
 	// UI execute block
 	// ****************
-	Blamath bla;
-	while (cin >> bla) {
-		cout << bla << endl;
-	}
+	Blamath bla = "-5.0+1*50"; //=> 45
+	cout << bla << endl;
 
 	//*********
 	// API 1
