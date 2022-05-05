@@ -140,7 +140,13 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
         }else if(thisArgStr == "-") {
             if (input.size() > 0) {
                 if (IsNumber(input[input.size() - 1])) {
-                    input[input.size() - 1] = to_string((stold(input[input.size() - 1]) * -1));
+                    std::ostringstream oss;
+                    if (input[input.size() - 1][(input[input.size() - 1]).size() - 1] == '(') {
+                        input[input.size() - 1] = '(' + input[input.size() - 1];
+                    }else {
+                        oss << stof(input[input.size() - 1]) * -1;
+                        input[input.size() - 1] = oss.str();
+                    }
                 }
             }
         }else if (thisArgStr == "=" && isEdit) {
