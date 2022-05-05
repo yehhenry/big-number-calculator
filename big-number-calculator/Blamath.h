@@ -62,6 +62,8 @@ public:
 	std::string getIntPart() const;
 	// 取得小數點後部分的字串
 	std::string getDecPart() const;
+	// 取得值
+	string getValue();
 
 	// 設定保留的小數後位數
 	static void blaScale(int scale);

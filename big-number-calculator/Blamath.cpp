@@ -898,6 +898,15 @@ std::string Blamath::getDecPart() const {
 		return std::string("0");
 }
 
+string Blamath::getValue() {
+	if (this->isInteger) {
+		return this->getIntPart();
+	}
+	else {
+		return this->toString();
+	}
+}
+
 void Blamath::blaScale(int scale) {
 	if (scale < 0) {
 		_blaScale = 0;

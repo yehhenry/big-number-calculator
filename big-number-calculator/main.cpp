@@ -9,7 +9,7 @@ int main() {
 	// ****************
 	Blamath bla;
 	while (cin >> bla) {
-		cout << bla;
+		cout << bla << endl;
 	}
 
 	//*********
