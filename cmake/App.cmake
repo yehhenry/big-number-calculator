@@ -100,10 +100,11 @@ MACRO(ADD_APP source_list)
   endif ()
 
   # Copy resources to assets directory
-#  add_custom_command(TARGET ${APP_NAME} POST_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_RESOURCES_DIR}" "${ASSETS_PATH}/resources"
+  add_custom_command(TARGET ${APP_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${ULTRALIGHT_RESOURCES_DIR}" "${ASSETS_PATH}/resources"
 #    COMMAND bash -c "cp ${CMAKE_CURRENT_LIST_DIR}/Icon? ${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/"
-#    COMMAND bash -c "${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}")
+#    COMMAND bash -c "${CMAKE_CURRENT_LIST_DIR}/cmake-build-debug/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}"
+  )
 
     
   add_dependencies(${APP_NAME} UltralightSDK)
