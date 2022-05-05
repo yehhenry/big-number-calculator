@@ -6,7 +6,8 @@ __Blabla - A Big Number Calculate__
 __檔案在一個叫GUI的資料夾裡__
 
 ```
-macOS: ./GUI/BlaCalculate.app
+macOS: ./GUI/BlaCalculate.app.zip
+解壓後即可get愛啪啪
 最低系統要求: macOS 12.0
 
 Windows: ./GUI/葉柏亨把路徑補上來，icon記得換
