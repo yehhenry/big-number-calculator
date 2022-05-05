@@ -9,10 +9,6 @@ static int _blaScale = 100;
 static const std::string ONE("1");
 static const std::string ZERO("0");
 
-bool _isInt = true;
-
-vector<string> res;
-
 // 透過字串取得符號階層
 int precedenceByString(string c) {
 	if (c == "!") {
@@ -79,14 +75,14 @@ void replaceAll(string& s, string const& toReplace, string const& replaceWith) {
 }
 
 // 將算式轉換為後序式
-void infixToPostfix(string str) {
+vector<string> infixToPostfix(string str) {
 	stack<string> st;
 	string result;
+	vector<string> res;
 
 	str.erase(remove(str.begin(), str.end(), ' '), str.end()); // 移除空白
 	replaceAll(str, "Power", ""); // 清除 Power
 
-	res.clear();
 	for (int i = 0; i < str.length(); i++) {
 		char c = str[i];
 		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
@@ -124,9 +120,14 @@ void infixToPostfix(string str) {
 	}
 
 	while (!st.empty()) {
+		if (st.top()[0] == '\0') {
+			st.pop();
+			continue;
+		}
 		res.push_back(st.top());
 		st.pop();
 	}
+	return res;
 }
 
 // 透過指定的符號取得兩數計算的結果
@@ -159,26 +160,14 @@ string calculate(Blamath a, Blamath b, const std::string operatorSign) {
 }
 
 // 取得後序式運算後的結果
-string evaluatePostfixExpression() {
+string evaluatePostfixExpression(vector<string> res) {
 	stack <string> myStack;
 	string str;
-	char c = res[res.size() - 1][0];
-	int j = 0;
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '!' || c == '^' || c == '*' || c == '/' || c == '+' || c == '-' || c == ',') {
-		j = res.size();
-	}
-	else {
-		j = res.size() - 1;
-	}
-	for (int i = 0; i < j; i++)
-	{
+	for (int i = 0; i < res.size(); i++) {
 		str = res[i];
 
 		if (str != "!" && str != "^" && str != "*" && str != "/" && str != "+" && str != "-" && str != ",") {
 			myStack.push(res[i]);
-			if (myStack.top().find('.') != string::npos) {
-				_isInt = false;
-			}
 		}
 		else if (str == "!") {
 			Blamath a(myStack.top());
@@ -704,17 +693,27 @@ Blamath::Blamath(const Blamath& bla) {
 }
 
 Blamath::Blamath(const char* num) {
-	infixToPostfix(num);
-	this->value = evaluatePostfixExpression();
+	this->value = evaluatePostfixExpression(infixToPostfix(num));
 	this->value = blaAdd(this->value, ZERO);
-	this->isInteger = _isInt;
+	string temp = this->value.substr(this->value.find(".") + 1);
+	for (char& c : temp) {
+		if (c != '0') {
+			this->isInteger = false;
+			break;
+		}
+	}
 }
 
 Blamath::Blamath(std::string num) {
-	infixToPostfix(num);
-	this->value = evaluatePostfixExpression();
+	this->value = evaluatePostfixExpression(infixToPostfix(num));
 	this->value = blaAdd(this->value, ZERO);
-	this->isInteger = _isInt;
+	string temp = this->value.substr(this->value.find(".") + 1);
+	for (char& c : temp) {
+		if (c != '0') {
+			this->isInteger = false;
+			break;
+		}
+	}
 }
 
 Blamath::Blamath(int num) {

@@ -7,9 +7,10 @@ int main() {
 	//*****************
 	// UI execute block
 	// ****************
-	//Blamath bla;
-	//cin >> bla;
-	//cout << bla;
+	Blamath bla;
+	while (cin >> bla) {
+		cout << bla;
+	}
 
 	//*********
 	// API 1
