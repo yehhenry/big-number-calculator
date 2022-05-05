@@ -181,7 +181,13 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
         SetText(ctx, ".sub-number", join(result, ""));
     }else {
         // TODO: call Blamath program & fetch result
-        string blaResult = "this is Blamath result!!"; // fake result
+        FILE * fp;
+        char buffer[65536];
+        fp=popen("whoami", "r");
+        fgets(buffer, sizeof(buffer), fp);
+        pclose(fp);
+
+        string blaResult = buffer; // fake result
         SetText(ctx, ".sub-number", join(input, ""));
         SetText(ctx, ".main-number", blaResult);
     }
