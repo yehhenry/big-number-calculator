@@ -9,9 +9,7 @@ static int _blaScale = 100;
 static const std::string ONE("1");
 static const std::string ZERO("0");
 
-vector<string> res;
-
-// 透過字串取得符號階層
+// ?z?L?r????o??????h
 int precedenceByString(string c) {
 	if (c == "!") {
 		return 5;
@@ -33,7 +31,7 @@ int precedenceByString(string c) {
 	}
 }
 
-// 透過字元取得符號階層
+// ?z?L?r?????o??????h
 int precedenceByChar(char c)
 {
 	if (c == '!') {
@@ -56,7 +54,7 @@ int precedenceByChar(char c)
 	}
 }
 
-// 將所有指定的字串取代為新的字串
+// ?N??????w???r????N???s???r??
 void replaceAll(string& s, string const& toReplace, string const& replaceWith) {
 	ostringstream oss;
 	size_t pos = 0;
@@ -76,15 +74,15 @@ void replaceAll(string& s, string const& toReplace, string const& replaceWith) {
 	s = oss.str();
 }
 
-// 將算式轉換為後序式
-void infixToPostfix(string str) {
+// ?N??????????
+vector<string> infixToPostfix(string str) {
 	stack<string> st;
 	string result;
+	vector<string> res;
 
-	str.erase(remove(str.begin(), str.end(), ' '), str.end()); // 移除空白
-	replaceAll(str, "Power", ""); // 清除 Power
+	str.erase(remove(str.begin(), str.end(), ' '), str.end()); // ???????
+	replaceAll(str, "Power", ""); // ?M?? Power
 
-	res.clear();
 	for (int i = 0; i < str.length(); i++) {
 		char c = str[i];
 		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
@@ -122,12 +120,17 @@ void infixToPostfix(string str) {
 	}
 
 	while (!st.empty()) {
+		if (st.top()[0] == '\0') {
+			st.pop();
+			continue;
+		}
 		res.push_back(st.top());
 		st.pop();
 	}
+	return res;
 }
 
-// 透過指定的符號取得兩數計算的結果
+// ?z?L???w????????o???p?????G
 string calculate(Blamath a, Blamath b, const std::string operatorSign) {
 	Blamath temp;
 	if (operatorSign == "+") {
@@ -156,20 +159,11 @@ string calculate(Blamath a, Blamath b, const std::string operatorSign) {
 	}
 }
 
-// 取得後序式運算後的結果
-string evaluatePostfixExpression() {
+// ???o?????B??????G
+string evaluatePostfixExpression(vector<string> res) {
 	stack <string> myStack;
 	string str;
-	char c = res[res.size() - 1][0];
-	int j = 0;
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '!' || c == '^' || c == '*' || c == '/' || c == '+' || c == '-' || c == ',') {
-		j = res.size();
-	}
-	else {
-		j = res.size() - 1;
-	}
-	for (int i = 0; i < j; i++)
-	{
+	for (int i = 0; i < res.size(); i++) {
 		str = res[i];
 
 		if (str != "!" && str != "^" && str != "*" && str != "/" && str != "+" && str != "-" && str != ",") {
@@ -180,8 +174,7 @@ string evaluatePostfixExpression() {
 			myStack.pop();
 			myStack.push(a.getFactorial().toString());
 		}
-		else if (str == "^" || str == "*" || str == "/" || str == "+" || str == "-" || str == ",") //found operator
-		{
+		else if (str == "^" || str == "*" || str == "/" || str == "+" || str == "-" || str == ",") { //found operator
 
 			Blamath b(myStack.top());
 			myStack.pop();
@@ -700,13 +693,27 @@ Blamath::Blamath(const Blamath& bla) {
 }
 
 Blamath::Blamath(const char* num) {
-	infixToPostfix(num);
-	this->value = evaluatePostfixExpression();
+	this->value = evaluatePostfixExpression(infixToPostfix(num));
+	this->value = blaAdd(this->value, ZERO);
+	string temp = this->value.substr(this->value.find(".") + 1);
+	for (char& c : temp) {
+		if (c != '0') {
+			this->isInteger = false;
+			break;
+		}
+	}
 }
 
 Blamath::Blamath(std::string num) {
-	infixToPostfix(num);
-	this->value = evaluatePostfixExpression();
+	this->value = evaluatePostfixExpression(infixToPostfix(num));
+	this->value = blaAdd(this->value, ZERO);
+	string temp = this->value.substr(this->value.find(".") + 1);
+	for (char& c : temp) {
+		if (c != '0') {
+			this->isInteger = false;
+			break;
+		}
+	}
 }
 
 Blamath::Blamath(int num) {
@@ -833,8 +840,7 @@ bool Blamath::operator <= (const Blamath& bla) {
 std::istream& operator>>(std::istream& is, Blamath& bla) {
 	string equ;
 	getline(is, equ);
-	infixToPostfix(equ);
-	bla.value = evaluatePostfixExpression();
+	bla = equ;
 	return is;
 }
 std::ostream& operator<<(std::ostream& os, const Blamath& bla) {
@@ -890,6 +896,15 @@ std::string Blamath::getDecPart() const {
 		return this->value.length() > dot + 1 ? this->value.substr(dot + 1) : std::string("0");
 	else
 		return std::string("0");
+}
+
+string Blamath::getValue() {
+	if (this->isInteger) {
+		return this->getIntPart();
+	}
+	else {
+		return this->toString();
+	}
 }
 
 void Blamath::blaScale(int scale) {

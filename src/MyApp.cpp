@@ -100,7 +100,7 @@ void MyApp::OnFinishLoading(ultralight::View* caller,
 bool MyApp::IsNumber(const std::string& s)
 {
     std::string::const_iterator it = s.begin();
-    while (it != s.end() && (std::isdigit(*it) || *it == '-')) ++it;
+    while (it != s.end() && (std::isdigit(*it) || *it == '-' || *it == '(' || *it == '.')) ++it;
     return !s.empty() && it == s.end();
 }
 
@@ -140,7 +140,7 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
         }else if(thisArgStr == "-") {
             if (input.size() > 0) {
                 if (IsNumber(input[input.size() - 1])) {
-                    input[input.size() - 1] = to_string((stoi(input[input.size() - 1]) * -1));
+                    input[input.size() - 1] = to_string((stold(input[input.size() - 1]) * -1));
                 }
             }
         }else if (thisArgStr == "=" && isEdit) {
@@ -205,10 +205,8 @@ JSValueRef MyApp::OnButtonClick(JSContextRef ctx, JSObjectRef function,
         string task = join(input, "");
 
         Blamath bla(task);
-        stringstream ss;
-        ss << bla;
         SetText(ctx, ".sub-number", join(input, ""));
-        SetText(ctx, ".main-number", ss.str());
+        SetText(ctx, ".main-number", bla.getValue());
     }
     return JSValueMakeNull(ctx);
 }
