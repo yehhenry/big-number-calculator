@@ -399,7 +399,6 @@ FodyWeavers.xsd
 
 # Ignore build/bin directories
 [Bb]uild/
-build_*/
 .DS_Store
 .idea/
 cmake-build-debug-coverage
