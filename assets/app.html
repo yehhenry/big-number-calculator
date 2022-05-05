@@ -1,300 +1,308 @@
 <html>
-  <head>
+<head>
     <title>Bla Calculate</title>
     <link rel="stylesheet" href="bootstrap.min.css">
     <style>
-      :root {
-        --main-text: #303133;
-        --gray-text: #5e6d82;
-        --primary-bg: #0d6efd;
-        --primary-bg-active: #0d67fd;
-        --level1-gray-bg: #DCDFE6;
-        --level2-gray-bg: #E4E7ED;
-        --level3-gray-bg: #EBEEF5;
-        --level4-gray-bg: #F2F6FC;
-      }
-      * {
-        position: relative;
-        font-famliy: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
-      }
-      body {
-        padding: 0;
-        margin: 0;
-        background: white;
-      }
-      #result {
-        border-bottom: .1px rgba(0, 0, 0, .3) solid;
-        min-height: 120px;
-        text-align: right;
-        margin-bottom: 30px;
-      }
-      .control-btn {
-        margin-bottom: 15px;
-      }
-      .main-number {
-        font-weight: 700;
-        font-size: 30px;
-        width: 100%;
-        word-break: break-all;
-        -webkit-line-clamp: 2;
-        color: #333;
-        overflow-y: auto;
-        height: 80px;
-      }
-      .sub-number {
-        margin-top: 30px;
-        color: var(--gray-text);
-        font-size: 16px;
-      }
-      .col-20 {
-        flex: 0 0 auto;
-        width: 20%;
-      }
-      .col-40 {
-        flex: 0 0 auto;
-        width: 40%;
-      }
-      .calc-btn {
-        width: 100%;
-        padding-bottom: 100%;
-        height: 0;
-        background: var(--level3-gray-bg);
-        border-radius: 7.5px;
-        color: var(--main-text);
-        transition: .1s ease-in-out;
-      }
-      .calc-btn.double-space {
-        width: 100%!important;
-        padding-bottom: calc(50% - (15px / 2) - (15px / 3));
-        margin: 0;
-      }
-      .calc-btn.calc-btn-disabled {
-        background: var(--level4-gray-bg)!important;
-        cursor: not-allowed;
-      }
-      .calc-function {
-        background: var(--level1-gray-bg);
-      }
+        :root {
+            --main-text: #303133;
+            --gray-text: #5e6d82;
+            --primary-bg: #0d6efd;
+            --primary-bg-active: #0d67fd;
+            --level1-gray-bg: #DCDFE6;
+            --level2-gray-bg: #E4E7ED;
+            --level3-gray-bg: #EBEEF5;
+            --level4-gray-bg: #F2F6FC;
+        }
+        * {
+            position: relative;
+            font-famliy: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
+        }
+        body {
+            padding: 0;
+            margin: 0;
+            background: white;
+        }
+        #result {
+            border-bottom: .1px rgba(0, 0, 0, .3) solid;
+            min-height: 120px;
+            text-align: right;
+            margin-bottom: 30px;
+        }
+        .control-btn {
+            margin-bottom: 15px;
+        }
+        .main-number {
+            font-weight: 700;
+            font-size: 30px;
+            width: 100%;
+            word-break: break-all;
+            -webkit-line-clamp: 2;
+            color: #333;
+            overflow-y: auto;
+            height: 80px;
+        }
+        .sub-number {
+            margin-top: 30px;
+            color: var(--gray-text);
+            font-size: 16px;
+        }
+        .col-20 {
+            flex: 0 0 auto;
+            width: 20%;
+        }
+        .col-40 {
+            flex: 0 0 auto;
+            width: 40%;
+        }
+        .calc-btn {
+            width: 100%;
+            padding-bottom: 100%;
+            height: 0;
+            background: var(--level3-gray-bg);
+            border-radius: 7.5px;
+            color: var(--main-text);
+            transition: .1s ease-in-out;
+        }
+        .calc-btn.double-space {
+            width: 100%!important;
+            padding-bottom: calc(50% - (15px / 2) - (15px / 3));
+            margin: 0;
+        }
+        .calc-btn.calc-btn-disabled {
+            background: var(--level4-gray-bg)!important;
+            cursor: not-allowed;
+        }
+        .calc-function {
+            background: var(--level1-gray-bg);
+        }
 
-      .calc-primary {
-        background: var(--primary-bg)!important;
-        color: white!important;
-      }
-      .calc-primary:active {
-        background: var(--primary-bg-active)!important;
-      }
-      .calc-btn> span {
-        font-size: 24px;
-        height: 100%;
-        position: absolute;
-        width: 100%;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, calc(-25% + 4px));
-        text-align: center;
-        font-weight: 600;
-        user-select: none!important;
-      }
-      .calc-btn:active {
-        background: var(--level2-gray-bg);
-      }
-      .container {
-        max-width: 640px;
-      }
+        .calc-primary {
+            background: var(--primary-bg)!important;
+            color: white!important;
+        }
+        .calc-primary:active {
+            background: var(--primary-bg-active)!important;
+        }
+        .calc-btn> span {
+            font-size: 24px;
+            height: 100%;
+            position: absolute;
+            width: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, calc(-25% + 4px));
+            text-align: center;
+            font-weight: 600;
+            user-select: none!important;
+            -webkit-user-select: none!important;
+            -moz-user-select: none!important;
+            -ms-user-select: none!important;
+        }
+        .calc-btn> span> svg {
+            transform: translate(0%, 4px)!important;
+            width: 36px!important;
+        }
+        .calc-btn:active {
+            background: var(--level2-gray-bg);
+        }
+        .container {
+            max-width: 640px;
+        }
     </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
+</head>
+<body>
+<div class="container">
+    <div class="row">
         <div class="col-12">
-          <div id="result">
-            <div class="sub-number">
-              100 + 100 ^ 12
+            <div id="result">
+                <div class="sub-number">
+                    100 + 100 ^ 12
+                </div>
+                <div class="main-number">
+                    1234567890
+                </div>
             </div>
-            <div class="main-number">
-              1234567890
+        </div>
+    </div>
+    <div class="row control-btn">
+        <div class="col-20">
+            <div class="calc-btn calc-function" onclick="OnButtonClick('edit');">
+            <span>
+              <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ba633cb8=""><path fill="currentColor" d="M832 512a32 32 0 1 1 64 0v352a32 32 0 0 1-32 32H160a32 32 0 0 1-32-32V160a32 32 0 0 1 32-32h352a32 32 0 0 1 0 64H192v640h640V512z"></path><path fill="currentColor" d="m469.952 554.24 52.8-7.552L847.104 222.4a32 32 0 1 0-45.248-45.248L477.44 501.44l-7.552 52.8zm422.4-422.4a96 96 0 0 1 0 135.808l-331.84 331.84a32 32 0 0 1-18.112 9.088L436.8 623.68a32 32 0 0 1-36.224-36.224l15.104-105.6a32 32 0 0 1 9.024-18.112l331.904-331.84a96 96 0 0 1 135.744 0z"></path></svg>
+            </span>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="row control-btn">
-        <div class="col-20">
-          <div class="calc-btn calc-btn-disabled">
-              <span>
-
-              </span>
-          </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn calc-function" onclick="OnButtonClick('reset');">
+            <div class="calc-btn calc-function" onclick="OnButtonClick('reset');">
               <span>
                   AC
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn calc-function" onclick="OnButtonClick('(');">
+            <div class="calc-btn calc-function" onclick="OnButtonClick('(');">
               <span>
                   (
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn calc-function" onclick="OnButtonClick(')');">
+            <div class="calc-btn calc-function" onclick="OnButtonClick(')');">
               <span>
                   )
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn calc-function" onclick="OnButtonClick(' / ');">
+            <div class="calc-btn calc-function" onclick="OnButtonClick(' / ');">
               <span>
                   /
               </span>
-          </div>
+            </div>
         </div>
-      </div>
-      <div class="row control-btn">
+    </div>
+    <div class="row control-btn">
         <div class="col-20">
-          <div class="calc-btn calc-function" onclick="OnButtonClick('-');">
+            <div class="calc-btn calc-function" onclick="OnButtonClick('-');">
               <span>
                   +/-
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn">
+            <div class="calc-btn" onclick="OnButtonClick('7');">
               <span>
                   7
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn">
+            <div class="calc-btn" onclick="OnButtonClick('8');">
               <span>
                   8
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn">
+            <div class="calc-btn" onclick="OnButtonClick('9');">
               <span>
                   9
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn calc-function" onclick="OnButtonClick(' * ');">
+            <div class="calc-btn calc-function" onclick="OnButtonClick(' * ');">
               <span>
                   &#x2715
               </span>
-          </div>
+            </div>
         </div>
-      </div>
-      <div class="row control-btn">
+    </div>
+    <div class="row control-btn">
         <div class="col-20">
-          <div class="calc-btn calc-function" onclick="OnButtonClick('! ');">
+            <div class="calc-btn calc-function" onclick="OnButtonClick('! ');">
               <span>
                   X!
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn">
+            <div class="calc-btn" onclick="OnButtonClick('4');">
               <span>
                   4
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn">
+            <div class="calc-btn" onclick="OnButtonClick('5');">
               <span>
                   5
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn">
+            <div class="calc-btn" onclick="OnButtonClick('6');">
               <span>
                   6
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn calc-function" onclick="OnButtonClick(' - ');">
+            <div class="calc-btn calc-function" onclick="OnButtonClick(' - ');">
               <span>
                   -
               </span>
-          </div>
+            </div>
         </div>
-      </div>
-      <div class="row control-btn">
+    </div>
+    <div class="row control-btn">
         <div class="col-20">
-          <div class="calc-btn calc-function" onclick="OnButtonClick('^ ');">
+            <div class="calc-btn calc-function" onclick="OnButtonClick('^ ');">
               <span>
                   X^
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn">
+            <div class="calc-btn" onclick="OnButtonClick('1');">
               <span>
                   1
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn">
+            <div class="calc-btn" onclick="OnButtonClick('2');">
               <span>
                   2
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn">
+            <div class="calc-btn" onclick="OnButtonClick('3');">
               <span>
                   3
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn calc-function" onclick="OnButtonClick(' + ');">
+            <div class="calc-btn calc-function" onclick="OnButtonClick(' + ');">
               <span>
                   +
               </span>
-          </div>
+            </div>
         </div>
-      </div>
-      <div class="row control-btn">
+    </div>
+    <div class="row control-btn">
         <div class="col-20">
-          <div class="calc-btn calc-btn-disabled">
+            <div class="calc-btn calc-function" onclick="OnButtonClick('<');">
               <span>
+                  <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ba633cb8=""><path fill="currentColor" d="M609.408 149.376 277.76 489.6a32 32 0 0 0 0 44.672l331.648 340.352a29.12 29.12 0 0 0 41.728 0 30.592 30.592 0 0 0 0-42.752L339.264 511.936l311.872-319.872a30.592 30.592 0 0 0 0-42.688 29.12 29.12 0 0 0-41.728 0z"></path></svg>
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-40">
-          <div class="calc-btn double-space">
+            <div class="calc-btn double-space" onclick="OnButtonClick('0');">
               <span>
                 0
               </span>
-          </div>
+            </div>
         </div>
 
         <div class="col-20">
-          <div class="calc-btn">
+            <div class="calc-btn" onclick="OnButtonClick('.');">
               <span>
                   .
               </span>
-          </div>
+            </div>
         </div>
         <div class="col-20">
-          <div class="calc-btn calc-primary">
+            <div class="calc-btn calc-primary" onclick="OnButtonClick('=');">
               <span>
                   =
               </span>
-          </div>
+            </div>
         </div>
-      </div>
     </div>
-  </body>
+</div>
+</body>
 </html>
