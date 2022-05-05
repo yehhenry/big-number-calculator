@@ -9,6 +9,8 @@ static int _blaScale = 100;
 static const std::string ONE("1");
 static const std::string ZERO("0");
 
+bool _isInt = true;
+
 vector<string> res;
 
 // 透過字串取得符號階層
@@ -174,14 +176,16 @@ string evaluatePostfixExpression() {
 
 		if (str != "!" && str != "^" && str != "*" && str != "/" && str != "+" && str != "-" && str != ",") {
 			myStack.push(res[i]);
+			if (myStack.top().find('.') != string::npos) {
+				_isInt = false;
+			}
 		}
 		else if (str == "!") {
 			Blamath a(myStack.top());
 			myStack.pop();
 			myStack.push(a.getFactorial().toString());
 		}
-		else if (str == "^" || str == "*" || str == "/" || str == "+" || str == "-" || str == ",") //found operator
-		{
+		else if (str == "^" || str == "*" || str == "/" || str == "+" || str == "-" || str == ",") { //found operator
 
 			Blamath b(myStack.top());
 			myStack.pop();
@@ -702,11 +706,15 @@ Blamath::Blamath(const Blamath& bla) {
 Blamath::Blamath(const char* num) {
 	infixToPostfix(num);
 	this->value = evaluatePostfixExpression();
+	this->value = blaAdd(this->value, ZERO);
+	this->isInteger = _isInt;
 }
 
 Blamath::Blamath(std::string num) {
 	infixToPostfix(num);
 	this->value = evaluatePostfixExpression();
+	this->value = blaAdd(this->value, ZERO);
+	this->isInteger = _isInt;
 }
 
 Blamath::Blamath(int num) {
@@ -833,8 +841,7 @@ bool Blamath::operator <= (const Blamath& bla) {
 std::istream& operator>>(std::istream& is, Blamath& bla) {
 	string equ;
 	getline(is, equ);
-	infixToPostfix(equ);
-	bla.value = evaluatePostfixExpression();
+	bla = equ;
 	return is;
 }
 std::ostream& operator<<(std::ostream& os, const Blamath& bla) {
