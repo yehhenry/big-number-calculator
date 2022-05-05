@@ -1,13 +1,14 @@
 #pragma once
 #pragma warning(disable : 4996)
 
-#include<iostream>
-#include<sstream>
+#include <iostream>
+#include <sstream>
 #include <algorithm>
 #include <string>
 #include <stdlib.h>
 #include <stack>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -52,6 +53,8 @@ public:
 	friend std::istream& operator>>(std::istream& is, Blamath& bla);
 	friend std::ostream& operator<<(std::ostream& os, const Blamath& bla);
 
+	string originalEquation = "";
+
 	// 取得完整數字字串
 	std::string toString() const;
 	// 四捨五入到指定小數點後位數
@@ -62,6 +65,12 @@ public:
 	std::string getIntPart() const;
 	// 取得小數點後部分的字串
 	std::string getDecPart() const;
+	// 取得值
+	std::string getValue();
+	// Get sub equations limit
+	int getSubEquaCount(string);
+	// Get Layer 1th sub equations list
+	map<string, string> getLayer1SubEquations(string);
 
 	// 設定保留的小數後位數
 	static void blaScale(int scale);

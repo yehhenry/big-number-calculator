@@ -396,3 +396,11 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Ignore build/bin directories
+[Bb]uild/
+build_*/
+.DS_Store
+cmake-build-debug/
+.idea/
+cmake-build-debug-coverage
